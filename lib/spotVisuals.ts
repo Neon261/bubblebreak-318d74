@@ -11,27 +11,104 @@ import {
   UtensilsCrossed,
   type LucideIcon,
 } from 'lucide-react-native';
+import type { ImageSourcePropType } from 'react-native';
 
-import type { SpotCategory } from '@/lib/types';
+import barPhoto from '@/assets/spots/bar.png';
+import cafePhoto from '@/assets/spots/cafe.png';
+import craftPhoto from '@/assets/spots/craft.png';
+import culturePhoto from '@/assets/spots/culture.png';
+import foodPhoto from '@/assets/spots/food.png';
+import gamesPhoto from '@/assets/spots/games.png';
+import marketPhoto from '@/assets/spots/market.png';
+import musicPhoto from '@/assets/spots/music.png';
+import outdoorsPhoto from '@/assets/spots/outdoors.png';
+import sportPhoto from '@/assets/spots/sport.png';
+import { formatClock } from '@/lib/geo';
+import { spotEndsAt, spotStartsAt } from '@/lib/mockData';
+import type { Spot, SpotCategory } from '@/lib/types';
 
 export interface CategoryVisual {
   icon: LucideIcon;
   label: string;
   /** Soft background for the icon tile. */
   bgClass: string;
+  /** Map pin colour — hex, because native map props cannot parse oklch. */
+  pinColor: string;
+  /** Category photo shown on the cards. */
+  photo: ImageSourcePropType;
 }
 
 export const CATEGORY_VISUALS: Record<SpotCategory, CategoryVisual> = {
-  cafe: { icon: Coffee, label: 'Café', bgClass: 'bg-clay-soft' },
-  bar: { icon: Beer, label: 'Bar', bgClass: 'bg-sun-soft' },
-  food: { icon: UtensilsCrossed, label: 'Food', bgClass: 'bg-berry-soft' },
-  music: { icon: Music, label: 'Music', bgClass: 'bg-grape-soft' },
-  sport: { icon: Dumbbell, label: 'Sport', bgClass: 'bg-sky-soft' },
-  outdoors: { icon: Trees, label: 'Outdoors', bgClass: 'bg-moss-soft' },
-  culture: { icon: Palette, label: 'Culture', bgClass: 'bg-grape-soft' },
-  games: { icon: Dices, label: 'Games', bgClass: 'bg-sky-soft' },
-  market: { icon: ShoppingBasket, label: 'Market', bgClass: 'bg-sun-soft' },
-  craft: { icon: Hammer, label: 'Craft', bgClass: 'bg-clay-soft' },
+  cafe: {
+    icon: Coffee,
+    label: 'Café',
+    bgClass: 'bg-clay-soft',
+    pinColor: '#c98f5a',
+    photo: cafePhoto,
+  },
+  bar: {
+    icon: Beer,
+    label: 'Bar',
+    bgClass: 'bg-sun-soft',
+    pinColor: '#e2a32b',
+    photo: barPhoto,
+  },
+  food: {
+    icon: UtensilsCrossed,
+    label: 'Food',
+    bgClass: 'bg-berry-soft',
+    pinColor: '#e0503f',
+    photo: foodPhoto,
+  },
+  music: {
+    icon: Music,
+    label: 'Music',
+    bgClass: 'bg-grape-soft',
+    pinColor: '#9a67cd',
+    photo: musicPhoto,
+  },
+  sport: {
+    icon: Dumbbell,
+    label: 'Sport',
+    bgClass: 'bg-sky-soft',
+    pinColor: '#3d8fdc',
+    photo: sportPhoto,
+  },
+  outdoors: {
+    icon: Trees,
+    label: 'Outdoors',
+    bgClass: 'bg-moss-soft',
+    pinColor: '#46a86a',
+    photo: outdoorsPhoto,
+  },
+  culture: {
+    icon: Palette,
+    label: 'Culture',
+    bgClass: 'bg-grape-soft',
+    pinColor: '#6248c8',
+    photo: culturePhoto,
+  },
+  games: {
+    icon: Dices,
+    label: 'Games',
+    bgClass: 'bg-sky-soft',
+    pinColor: '#23a8b8',
+    photo: gamesPhoto,
+  },
+  market: {
+    icon: ShoppingBasket,
+    label: 'Market',
+    bgClass: 'bg-sun-soft',
+    pinColor: '#b8397a',
+    photo: marketPhoto,
+  },
+  craft: {
+    icon: Hammer,
+    label: 'Craft',
+    bgClass: 'bg-clay-soft',
+    pinColor: '#7a8c3a',
+    photo: craftPhoto,
+  },
 };
 
 export const PRICE_LABELS: Record<'free' | 'cheap' | 'mid', string> = {
@@ -39,3 +116,28 @@ export const PRICE_LABELS: Record<'free' | 'cheap' | 'mid', string> = {
   cheap: 'Cheap',
   mid: 'Mid-priced',
 };
+
+/** Your own pin on the discover map. */
+export const HOME_PIN_COLOR = '#14776b';
+
+/** What to put on the category chip: events read as their category too. */
+export function categoryLabel(spot: Spot): string {
+  return CATEGORY_VISUALS[spot.category].label;
+}
+
+/** Cuisine plus price range, for anywhere that serves food or drinks. */
+export function foodLine(spot: Spot): string | undefined {
+  if (!spot.cuisine) return undefined;
+  return `${spot.cuisine} · ${spot.priceTier ?? PRICE_LABELS[spot.price]}`;
+}
+
+/** Events show the window they run in, places just say they are open. */
+export function timeLine(spot: Spot): string {
+  const startsAt = spotStartsAt(spot);
+  if (startsAt === undefined) return 'Open now';
+
+  const endsAt = spotEndsAt(spot);
+  return endsAt === undefined
+    ? `Today ${formatClock(startsAt)}`
+    : `Today ${formatClock(startsAt)}–${formatClock(endsAt)}`;
+}

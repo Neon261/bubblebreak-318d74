@@ -1,13 +1,15 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Button, Chip, Surface, Typography, useThemeColor } from 'heroui-native';
-import { RefreshCw, SearchX } from 'lucide-react-native';
-import { FlatList, View } from 'react-native';
+import { List, Map as MapIcon, RefreshCw, SearchX } from 'lucide-react-native';
+import { ScrollView, View } from 'react-native';
 
 import { EmptyState } from '@/components/EmptyState';
 import { GroupSizePicker } from '@/components/GroupSizePicker';
 import { RadiusSlider } from '@/components/RadiusSlider';
 import { SpotCard } from '@/components/SpotCard';
+import { SpotMap } from '@/components/SpotMap';
+import { SpotPreviewCard } from '@/components/SpotPreviewCard';
 import { distanceKm, travelMinutes } from '@/lib/geo';
 import { HOME, SPOTS } from '@/lib/mockData';
 import { clampSpots } from '@/lib/pings';
@@ -16,6 +18,7 @@ import { useAppStore } from '@/lib/store';
 import type { SpotKind } from '@/lib/types';
 
 type Filter = 'all' | SpotKind;
+type ViewMode = 'map' | 'list';
 
 const FILTERS: { key: Filter; label: string }[] = [
   { key: 'all', label: 'Everything' },
@@ -29,8 +32,10 @@ const BATCH = 5;
 export default function DiscoverScreen() {
   const router = useRouter();
   const [filter, setFilter] = useState<Filter>('all');
+  const [mode, setMode] = useState<ViewMode>('map');
   const [offset, setOffset] = useState(0);
-  const [accent] = useThemeColor(['accent']);
+  const [selectedId, setSelectedId] = useState<string>();
+  const [accent, accentForeground] = useThemeColor(['accent', 'accent-foreground']);
 
   const profile = useAppStore((state) => state.profile);
   const updateProfile = useAppStore((state) => state.updateProfile);
@@ -52,6 +57,7 @@ export default function DiscoverScreen() {
   if (filterKey !== prevFilterKey) {
     setPrevFilterKey(filterKey);
     setOffset(0);
+    setSelectedId(undefined);
   }
 
   const shown = useMemo(() => {
@@ -59,8 +65,14 @@ export default function DiscoverScreen() {
     return Array.from({ length: BATCH }, (_, index) => items[(offset + index) % items.length]);
   }, [items, offset]);
 
+  const selected = shown.find((item) => item.spot.id === selectedId) ?? shown[0];
   const canRotate = items.length > BATCH;
   const spots = clampSpots(profile.defaultSpots);
+
+  const rotate = () => {
+    setOffset((current) => (current + BATCH) % items.length);
+    setSelectedId(undefined);
+  };
 
   const choose = (spotId: string) => {
     const id = createPing(spotId, profile.radiusKm, spots);
@@ -69,66 +81,66 @@ export default function DiscoverScreen() {
   };
 
   return (
-    <FlatList
+    <ScrollView
       className="bg-background flex-1"
-      data={shown}
-      keyExtractor={({ spot }) => spot.id}
-      contentContainerClassName="gap-3 px-5 pb-12 pt-4"
+      contentContainerClassName="gap-4 px-5 pb-12 pt-4"
       showsVerticalScrollIndicator={false}
-      ListHeaderComponent={
-        <View className="gap-4 pb-2">
-          <View className="gap-1">
-            <Typography type="h3">Pick something</Typography>
-            <Typography type="body-sm" color="muted">
-              {canRotate
-                ? `${shown.length} of ${items.length} options within ${profile.radiusKm} km.`
-                : `${items.length} options within ${profile.radiusKm} km.`}{' '}
-              Choose one and everyone nearby with the app hears about it.
-            </Typography>
-          </View>
+    >
+      <View className="gap-1">
+        <Typography type="h3">Pick something</Typography>
+        <Typography type="body-sm" color="muted">
+          {canRotate
+            ? `${shown.length} of ${items.length} ideas within ${profile.radiusKm} km.`
+            : `${items.length} ideas within ${profile.radiusKm} km.`}{' '}
+          Choose one and everyone nearby with the app hears about it.
+        </Typography>
+      </View>
 
-          {canRotate ? (
-            <Button
-              variant="tertiary"
-              size="sm"
-              className="self-start"
-              onPress={() => setOffset((current) => (current + BATCH) % items.length)}
+      <View className="flex-row flex-wrap gap-2">
+        {FILTERS.map((item) => {
+          const active = filter === item.key;
+          return (
+            <Chip
+              key={item.key}
+              variant={active ? 'primary' : 'tertiary'}
+              color={active ? 'accent' : 'default'}
+              onPress={() => setFilter(item.key)}
             >
-              <RefreshCw color={accent} size={15} />
-              <Button.Label>Show me five others</Button.Label>
-            </Button>
-          ) : null}
+              <Chip.Label>{item.label}</Chip.Label>
+            </Chip>
+          );
+        })}
+      </View>
 
-          <View className="flex-row flex-wrap gap-2">
-            {FILTERS.map((item) => {
-              const selected = filter === item.key;
-              return (
-                <Chip
-                  key={item.key}
-                  variant={selected ? 'primary' : 'tertiary'}
-                  color={selected ? 'accent' : 'default'}
-                  onPress={() => setFilter(item.key)}
-                >
-                  <Chip.Label>{item.label}</Chip.Label>
-                </Chip>
-              );
-            })}
-          </View>
-
-          <Surface variant="default" className="gap-4 rounded-3xl p-4">
-            <GroupSizePicker
-              value={spots}
-              onChange={(count) => updateProfile({ defaultSpots: count })}
-              hint={`A group of ${spots + 1} in total. The first ${spots} ${spots === 1 ? 'person' : 'people'} to say yes are in, the rest get told the spots went.`}
-            />
-            <RadiusSlider
-              radiusKm={profile.radiusKm}
-              onChange={(km) => updateProfile({ radiusKm: km })}
-            />
-          </Surface>
+      <View className="flex-row items-center justify-between">
+        <View className="flex-row gap-2">
+          <Chip
+            variant={mode === 'map' ? 'primary' : 'tertiary'}
+            color={mode === 'map' ? 'accent' : 'default'}
+            onPress={() => setMode('map')}
+          >
+            <MapIcon color={mode === 'map' ? accentForeground : accent} size={13} />
+            <Chip.Label>Map</Chip.Label>
+          </Chip>
+          <Chip
+            variant={mode === 'list' ? 'primary' : 'tertiary'}
+            color={mode === 'list' ? 'accent' : 'default'}
+            onPress={() => setMode('list')}
+          >
+            <List color={mode === 'list' ? accentForeground : accent} size={13} />
+            <Chip.Label>List</Chip.Label>
+          </Chip>
         </View>
-      }
-      ListEmptyComponent={
+
+        {canRotate ? (
+          <Button variant="tertiary" size="sm" onPress={rotate}>
+            <RefreshCw color={accent} size={15} />
+            <Button.Label>Five others</Button.Label>
+          </Button>
+        ) : null}
+      </View>
+
+      {items.length === 0 ? (
         <EmptyState
           icon={SearchX}
           title="Nothing in range"
@@ -136,16 +148,55 @@ export default function DiscoverScreen() {
           actionLabel="Add 2 km"
           onAction={() => updateProfile({ radiusKm: Math.min(10, profile.radiusKm + 2) })}
         />
-      }
-      renderItem={({ item }) => (
-        <SpotCard
-          spot={item.spot}
-          distanceKm={item.km}
-          travelMinutes={travelMinutes(item.km, profile.travelMode)}
-          travelMode={profile.travelMode}
-          onPress={() => choose(item.spot.id)}
-        />
+      ) : mode === 'map' ? (
+        <View className="gap-3">
+          <SpotMap
+            home={HOME}
+            spots={shown.map((item) => item.spot)}
+            radiusKm={profile.radiusKm}
+            selectedId={selected?.spot.id}
+            onSelect={setSelectedId}
+          />
+
+          {selected ? (
+            <SpotPreviewCard
+              spot={selected.spot}
+              distanceKm={selected.km}
+              travelMinutes={travelMinutes(selected.km, profile.travelMode)}
+              onChoose={() => choose(selected.spot.id)}
+            />
+          ) : null}
+
+          <Typography type="body-xs" color="muted">
+            Tap a pin to see what it is, or switch to the list for the full details.
+          </Typography>
+        </View>
+      ) : (
+        <View className="gap-3">
+          {shown.map((item) => (
+            <SpotCard
+              key={item.spot.id}
+              spot={item.spot}
+              distanceKm={item.km}
+              travelMinutes={travelMinutes(item.km, profile.travelMode)}
+              travelMode={profile.travelMode}
+              onPress={() => choose(item.spot.id)}
+            />
+          ))}
+        </View>
       )}
-    />
+
+      <Surface variant="default" className="gap-4 rounded-3xl p-4">
+        <GroupSizePicker
+          value={spots}
+          onChange={(count) => updateProfile({ defaultSpots: count })}
+          hint={`A group of ${spots + 1} in total. The first ${spots} ${spots === 1 ? 'person' : 'people'} to say yes are in, the rest get told the spots went.`}
+        />
+        <RadiusSlider
+          radiusKm={profile.radiusKm}
+          onChange={(km) => updateProfile({ radiusKm: km })}
+        />
+      </Surface>
+    </ScrollView>
   );
 }

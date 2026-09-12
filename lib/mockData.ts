@@ -52,6 +52,8 @@ export const SPOTS: Spot[] = [
     meetingHint: 'Grab the far end of the long table by the window',
     location: offset(0.3, 0.5),
     price: 'cheap',
+    cuisine: 'Filter coffee & pastries',
+    priceTier: '€',
     bubbleTag: 'Nobody here works in your field',
     interests: ['talks', 'food'],
     crowd: 'Mixed ages, easy chatter',
@@ -100,6 +102,8 @@ export const SPOTS: Spot[] = [
     meetingHint: 'Green-flag table near the game shelf',
     location: offset(0.9, -1.4),
     price: 'cheap',
+    cuisine: 'Pizza slices & beer',
+    priceTier: '€€',
     bubbleTag: 'Green-flag tables are for open groups only',
     interests: ['games', 'talks'],
     crowd: 'Nerdy in the warmest way',
@@ -115,6 +119,8 @@ export const SPOTS: Spot[] = [
     meetingHint: 'Bottom of the stairs, sign-up clipboard',
     location: offset(1.8, 2.6),
     price: 'cheap',
+    cuisine: 'Drinks & fried snacks',
+    priceTier: '€',
     bubbleTag: 'Duets are assigned, not chosen',
     interests: ['music', 'dance'],
     crowd: 'Brave and slightly off-key',
@@ -131,6 +137,8 @@ export const SPOTS: Spot[] = [
     meetingHint: 'Middle bench under the big clock',
     location: offset(0.5, -0.6),
     price: 'mid',
+    cuisine: 'Street food, twenty kitchens',
+    priceTier: '€€',
     bubbleTag: 'Everyone shares a table by default',
     interests: ['food', 'talks'],
     crowd: 'Families, tourists, locals',
@@ -178,6 +186,7 @@ export const SPOTS: Spot[] = [
     meetingHint: 'Kitchen door in the courtyard',
     location: offset(1.1, -0.9),
     price: 'free',
+    cuisine: 'Vegetarian, cooked together',
     bubbleTag: 'Nobody arrives as a guest here',
     interests: ['food', 'talks'],
     crowd: 'Neighbourhood mix, all ages',
@@ -194,6 +203,8 @@ export const SPOTS: Spot[] = [
     meetingHint: 'Bar on the roof, left of the projector',
     location: offset(2.1, -4.1),
     price: 'mid',
+    cuisine: 'Rooftop bar snacks',
+    priceTier: '€€',
     bubbleTag: 'Film choice is announced only at the door',
     interests: ['art', 'talks'],
     crowd: 'Opinionated, welcoming',
@@ -210,6 +221,7 @@ export const SPOTS: Spot[] = [
     meetingHint: 'Sign-up sheet by the sound desk',
     location: offset(0.9, 1.9),
     startsInMinutes: 95,
+    runsForMinutes: 180,
     price: 'cheap',
     bubbleTag: 'Performers and audience mix all night',
     interests: ['music', 'art', 'talks'],
@@ -226,6 +238,7 @@ export const SPOTS: Spot[] = [
     meetingHint: 'Under the bridge, follow the speaker',
     location: offset(0.4, 1.4),
     startsInMinutes: 50,
+    runsForMinutes: 60,
     price: 'free',
     bubbleTag: 'Rotating partners, no experience allowed to matter',
     interests: ['dance', 'outdoors'],
@@ -243,7 +256,9 @@ export const SPOTS: Spot[] = [
     meetingHint: 'Front desk, they hand out tool numbers',
     location: offset(-1.1, -1.9),
     startsInMinutes: 130,
+    runsForMinutes: 240,
     price: 'free',
+    cuisine: 'Pizza, shared',
     bubbleTag: 'You get paired by problem, not by profile',
     interests: ['talks', 'art'],
     crowd: 'Tinkerers, retirees, students',
@@ -259,7 +274,10 @@ export const SPOTS: Spot[] = [
     meetingHint: 'Team draw happens at the bar',
     location: offset(0.6, 0.3),
     startsInMinutes: 75,
+    runsForMinutes: 150,
     price: 'cheap',
+    cuisine: 'Pub food & beer',
+    priceTier: '€€',
     bubbleTag: 'Random teams, literally out of a hat',
     interests: ['games', 'talks'],
     crowd: 'Trivia sharks and casuals',
@@ -276,6 +294,7 @@ export const SPOTS: Spot[] = [
     meetingHint: 'North side of the bridge, look for the yellow flag',
     location: offset(-1.5, 1.6),
     startsInMinutes: 35,
+    runsForMinutes: 75,
     price: 'free',
     bubbleTag: 'Pairs are set by pace, not by who you know',
     interests: ['sports', 'outdoors'],
@@ -293,6 +312,7 @@ export const SPOTS: Spot[] = [
     meetingHint: 'Studio on the first floor, shoes off',
     location: offset(-2.3, -5.2),
     startsInMinutes: 160,
+    runsForMinutes: 120,
     price: 'cheap',
     bubbleTag: 'Everyone is equally bad at this',
     interests: ['art'],
@@ -304,6 +324,13 @@ export function spotStartsAt(spot: Spot): number | undefined {
   return spot.startsInMinutes === undefined
     ? undefined
     : SESSION_START + spot.startsInMinutes * 60_000;
+}
+
+/** Events only: when the window closes again. */
+export function spotEndsAt(spot: Spot): number | undefined {
+  const startsAt = spotStartsAt(spot);
+  if (startsAt === undefined || spot.runsForMinutes === undefined) return undefined;
+  return startsAt + spot.runsForMinutes * 60_000;
 }
 
 export const PEOPLE: Person[] = [

@@ -29,6 +29,9 @@ export type SpotCategory =
 
 export type TravelMode = 'walk' | 'bike' | 'transit' | 'car';
 
+/** What a plate or a round costs, for places that serve food or drinks. */
+export type PriceTier = '€' | '€€' | '€€€';
+
 export type ReadyMinutes = 15 | 30 | 45 | 60;
 
 export interface Spot {
@@ -44,7 +47,13 @@ export interface Spot {
   location: Coordinate;
   /** Events only: minutes from session start until it kicks off. */
   startsInMinutes?: number;
+  /** Events only: how long the window lasts once it starts, in minutes. */
+  runsForMinutes?: number;
   price: 'free' | 'cheap' | 'mid';
+  /** Places that serve food or drinks: what kind of kitchen it is. */
+  cuisine?: string;
+  /** Places that serve food or drinks: the price range per person. */
+  priceTier?: PriceTier;
   /** Why this nudges you out of your usual circle. */
   bubbleTag: string;
   interests: Interest[];
