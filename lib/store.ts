@@ -22,6 +22,7 @@ import {
 import {
   type Coordinate,
   type IntroCategoryId,
+  type LocationDetails,
   ME,
   type Participant,
   type Ping,
@@ -79,7 +80,11 @@ export interface AppState {
   /** Newest first. */
   pingIds: string[];
   updateProfile: (patch: Partial<Profile>) => void;
-  setLocation: (permission: Profile['locationPermission'], location?: Coordinate) => void;
+  setLocation: (
+    permission: Profile['locationPermission'],
+    location?: Coordinate,
+    details?: LocationDetails,
+  ) => void;
   /** Registration step 1. */
   setFirstName: (firstName: string) => void;
   /** Registration step 2: answers the question currently shown for a group. */
@@ -165,12 +170,13 @@ export const useAppStore = create<AppState>()(
 
       updateProfile: (patch) => set((state) => ({ profile: { ...state.profile, ...patch } })),
 
-      setLocation: (permission, location) =>
+      setLocation: (permission, location, details) =>
         set((state) => ({
           profile: {
             ...state.profile,
             locationPermission: permission,
             location: permission === 'granted' ? location : undefined,
+            locationDetails: permission === 'granted' ? details : undefined,
           },
         })),
 

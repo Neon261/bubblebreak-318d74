@@ -3,6 +3,11 @@ export interface Coordinate {
   longitude: number;
 }
 
+export interface LocationDetails {
+  district: string;
+  city: string;
+}
+
 export type Interest =
   | 'music'
   | 'sports'
@@ -194,6 +199,7 @@ export interface Profile {
   /** Uses Hamburg city centre until foreground GPS access is granted. */
   locationPermission: 'notAsked' | 'granted' | 'denied';
   location?: Coordinate;
+  locationDetails?: LocationDetails;
   openToPings: boolean;
   notificationsEnabled: boolean;
   verification: VerificationInfo;

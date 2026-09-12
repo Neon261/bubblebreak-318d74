@@ -51,7 +51,11 @@ export function currentLocation(profile: Profile): Coordinate {
 }
 
 export function currentLocationLabel(profile: Profile): string {
-  return profile.locationPermission === 'granted' ? 'Your current location' : HAMBURG_CENTER.label;
+  if (profile.locationPermission !== 'granted') return HAMBURG_CENTER.label;
+  if (!profile.locationDetails) return 'Your current location';
+
+  const { district, city } = profile.locationDetails;
+  return district.toLocaleLowerCase() === city.toLocaleLowerCase() ? city : `${district}, ${city}`;
 }
 
 export function expectedArrivalAt(participant: Participant): number {

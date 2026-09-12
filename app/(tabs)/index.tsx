@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { Button, PressableFeedback, Surface, Typography } from 'heroui-native';
@@ -34,6 +34,20 @@ import {
 } from '@/lib/pings';
 import { useAppStore } from '@/lib/store';
 import { BRAND } from '@/lib/theme';
+import type { Coordinate, LocationDetails } from '@/lib/types';
+
+function locationDetailsFromAddress(
+  address: Location.LocationGeocodedAddress | undefined,
+): LocationDetails | undefined {
+  const district = address?.district?.trim() || address?.subregion?.trim();
+  const city = address?.city?.trim() || address?.region?.trim();
+  return district && city ? { district, city } : undefined;
+}
+
+async function reverseGeocodeLocation(location: Coordinate): Promise<LocationDetails | undefined> {
+  const addresses = await Location.reverseGeocodeAsync(location);
+  return locationDetailsFromAddress(addresses[0]);
+}
 
 /** A shared value that repeatedly animates from 0 to 1, for pulsing UI effects. */
 function usePulse(durationMs: number): SharedValue<number> {
@@ -63,8 +77,32 @@ export default function PingHomeScreen() {
 
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState<string>();
+  const triedRestoringLocationDetails = useRef(false);
   const origin = currentLocation(profile);
   const locationLabel = currentLocationLabel(profile);
+
+  useEffect(() => {
+    let active = true;
+
+    if (
+      profile.locationPermission === 'granted' &&
+      profile.location &&
+      !profile.locationDetails &&
+      !triedRestoringLocationDetails.current
+    ) {
+      triedRestoringLocationDetails.current = true;
+      const location = profile.location;
+      reverseGeocodeLocation(location)
+        .then((details) => {
+          if (active && details) setLocation('granted', location, details);
+        })
+        .catch(() => undefined);
+    }
+
+    return () => {
+      active = false;
+    };
+  }, [profile.location, profile.locationDetails, profile.locationPermission, setLocation]);
 
   const nearbySpots = useMemo(
     () => SPOTS.filter((spot) => distanceKm(origin, spot.location) <= profile.radiusKm).length,
@@ -102,10 +140,20 @@ export default function PingHomeScreen() {
       const result = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
-      setLocation('granted', {
+      const coordinate = {
         latitude: result.coords.latitude,
         longitude: result.coords.longitude,
-      });
+      };
+      let details: LocationDetails | undefined;
+      try {
+        details = await reverseGeocodeLocation(coordinate);
+      } catch {
+        // Coordinates remain usable even when the platform geocoder is temporarily unavailable.
+      }
+      setLocation('granted', coordinate, details);
+      if (!details) {
+        setLocationError('Location found, but its district and city could not be identified.');
+      }
     } catch {
       setLocationError('We could not read your location. Hamburg city centre stays selected.');
     } finally {
