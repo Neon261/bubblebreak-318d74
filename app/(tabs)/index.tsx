@@ -94,7 +94,7 @@ export default function PingHomeScreen() {
     >
       <View className="gap-1">
         <Typography type="body-xs" color="muted" className="tracking-widest uppercase">
-          RandoGather
+          BubbleBreak
         </Typography>
         <Typography type="h2">Out of your bubble</Typography>
         <View className="flex-row items-center gap-1.5">

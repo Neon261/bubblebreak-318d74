@@ -1,6 +1,6 @@
 {
-  "name": "RandoGather",
-  "short_name": "RandoGather",
+  "name": "BubbleBreak",
+  "short_name": "BubbleBreak",
   "description": "One button to find a nearby place or event, ping people around you and meet up.",
   "start_url": "/",
   "scope": "/",
