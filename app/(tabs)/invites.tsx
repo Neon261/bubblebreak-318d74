@@ -71,25 +71,28 @@ export default function InvitesScreen() {
             </Chip>
           </View>
 
-          <Surface
-            variant="default"
-            className="border-border flex-row items-center gap-4 rounded-3xl border p-4"
-          >
-            <View className="flex-1 gap-0.5">
-              <Typography type="body-sm" weight="medium">
-                Let strangers ping me
-              </Typography>
-              <Typography type="body-xs" color="muted">
-                Turn this off to stop new invitations. Your existing plans and chats stay available.
-              </Typography>
-            </View>
-            <Switch
-              isSelected={profile.openToPings}
-              onSelectedChange={(value) => updateProfile({ openToPings: value })}
+          {view === 'waiting' ? (
+            <Surface
+              variant="default"
+              className="border-border flex-row items-center gap-4 rounded-3xl border p-4"
             >
-              <Switch.Thumb />
-            </Switch>
-          </Surface>
+              <View className="flex-1 gap-0.5">
+                <Typography type="body-sm" weight="medium">
+                  Let strangers ping me
+                </Typography>
+                <Typography type="body-xs" color="muted">
+                  Turn this off to stop new invitations. Your existing plans and chats stay
+                  available.
+                </Typography>
+              </View>
+              <Switch
+                isSelected={profile.openToPings}
+                onSelectedChange={(value) => updateProfile({ openToPings: value })}
+              >
+                <Switch.Thumb />
+              </Switch>
+            </Surface>
+          ) : null}
         </View>
       }
       ListEmptyComponent={
