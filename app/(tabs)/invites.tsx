@@ -31,7 +31,9 @@ export default function InvitesScreen() {
   const rows = useMemo<Row[]>(() => {
     const inbound = pingList(pings, pingIds).filter((ping) => !isHostedByMe(ping));
     const visible =
-      view === 'waiting' ? inbound.filter(needsMyAnswer) : inbound.filter((ping) => !needsMyAnswer(ping));
+      view === 'waiting'
+        ? inbound.filter(needsMyAnswer)
+        : inbound.filter((ping) => !needsMyAnswer(ping));
     return visible.map((ping) => ({ kind: 'ping', key: ping.id, ping }));
   }, [pingIds, pings, view]);
 
@@ -69,9 +71,14 @@ export default function InvitesScreen() {
             </Chip>
           </View>
 
-          <Surface variant="default" className="border-border flex-row items-center gap-4 rounded-3xl border p-4">
+          <Surface
+            variant="default"
+            className="border-border flex-row items-center gap-4 rounded-3xl border p-4"
+          >
             <View className="flex-1 gap-0.5">
-              <Typography type="body-sm" weight="medium">Let strangers ping me</Typography>
+              <Typography type="body-sm" weight="medium">
+                Let strangers ping me
+              </Typography>
               <Typography type="body-xs" color="muted">
                 Turn this off to stop new invitations. Your existing plans and chats stay available.
               </Typography>

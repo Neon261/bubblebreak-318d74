@@ -32,7 +32,7 @@ import {
   pingSpot,
   spotsTaken,
 } from '@/lib/pings';
-import { peopleInRadius, useAppStore } from '@/lib/store';
+import { useAppStore } from '@/lib/store';
 import { BRAND } from '@/lib/theme';
 
 /** A shared value that repeatedly animates from 0 to 1, for pulsing UI effects. */
@@ -66,10 +66,6 @@ export default function PingHomeScreen() {
   const origin = currentLocation(profile);
   const locationLabel = currentLocationLabel(profile);
 
-  const nearbyPeople = useMemo(
-    () => peopleInRadius(profile.radiusKm, origin).length,
-    [origin, profile.radiusKm],
-  );
   const nearbySpots = useMemo(
     () => SPOTS.filter((spot) => distanceKm(origin, spot.location) <= profile.radiusKm).length,
     [origin, profile.radiusKm],
@@ -137,25 +133,23 @@ export default function PingHomeScreen() {
         </View>
       </View>
 
-      <Surface variant="default" className="border-border gap-4 rounded-3xl border p-4">
-        <View className="flex-row items-start justify-between gap-3">
-          <View className="flex-1 gap-1">
+      <Surface variant="default" className="border-border gap-3 rounded-3xl border p-3">
+        <View className="flex-row items-center gap-2">
+          <MapPin color={BRAND.teal} size={17} />
+          <View className="flex-1">
+            <Typography type="body-xs" color="muted">
+              Current location
+            </Typography>
             <Typography type="body-sm" weight="semibold">
               {locationLabel}
             </Typography>
-            <Typography type="body-xs" color="muted">
-              {profile.locationPermission === 'granted'
-                ? 'Only your phone uses this position for nearby ideas and travel estimates.'
-                : 'This is the default. You can only change it by granting your phone’s GPS location.'}
-            </Typography>
           </View>
-          <MapPin color={BRAND.secondary} size={20} />
+          {profile.locationPermission !== 'granted' ? (
+            <Button variant="secondary" size="sm" onPress={grantLocation} isDisabled={locating}>
+              <Button.Label>{locating ? 'Finding location…' : 'Change location'}</Button.Label>
+            </Button>
+          ) : null}
         </View>
-        <Button variant="secondary" size="sm" onPress={grantLocation} isLoading={locating}>
-          <Button.Label>
-            {profile.locationPermission === 'granted' ? 'Refresh GPS location' : 'Use my GPS location'}
-          </Button.Label>
-        </Button>
         {locationError ? (
           <Typography type="body-xs" className="text-danger">
             {locationError}
@@ -164,7 +158,6 @@ export default function PingHomeScreen() {
         <RadiusSlider
           radiusKm={profile.radiusKm}
           onChange={(km) => updateProfile({ radiusKm: km })}
-          hint={`${nearbyPeople} people with the app are inside this radius right now.`}
         />
       </Surface>
 
@@ -283,32 +276,6 @@ export default function PingHomeScreen() {
           ))}
         </Surface>
       ) : null}
-
-      <View className="gap-3 px-1 pt-2">
-        <Heading type="h5">What would you like to do?</Heading>
-        <Surface variant="secondary" className="gap-2 rounded-3xl p-4">
-          <Typography type="body-sm" weight="semibold">
-            1 · Find an interesting activity
-          </Typography>
-          <Typography type="body-xs" color="muted">
-            Tap Get me out to see nearby places and things happening today.
-          </Typography>
-          <Button size="sm" onPress={() => router.push('/discover')}>
-            <Button.Label>Get me out</Button.Label>
-          </Button>
-        </Surface>
-        <Surface variant="default" className="border-border gap-2 rounded-3xl border p-4">
-          <Typography type="body-sm" weight="semibold">
-            2 · Join another person’s plan
-          </Typography>
-          <Typography type="body-xs" color="muted">
-            Open Invitations to answer nearby pings and keep up with chats.
-          </Typography>
-          <Button variant="secondary" size="sm" onPress={() => router.push('/invites')}>
-            <Button.Label>Check invitations</Button.Label>
-          </Button>
-        </Surface>
-      </View>
     </ScrollView>
   );
 }

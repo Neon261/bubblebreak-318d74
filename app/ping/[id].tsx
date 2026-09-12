@@ -17,7 +17,13 @@ import { computeMeetAt, distanceKm, formatClock, travelMinutes } from '@/lib/geo
 import { goBackOrReplace } from '@/lib/navigation';
 import {
   currentLocation,
-  myJoin, participantName, pingSpot, slowestJoin, spotsLeft, spotsTaken } from '@/lib/pings';
+  myJoin,
+  participantName,
+  pingSpot,
+  slowestJoin,
+  spotsLeft,
+  spotsTaken,
+} from '@/lib/pings';
 import { pushLocalNotification } from '@/lib/notifications';
 import { useAppStore } from '@/lib/store';
 import { BRAND } from '@/lib/theme';

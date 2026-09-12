@@ -93,7 +93,7 @@ export default function ChatScreen() {
         </View>
       </ScrollView>
 
-      <View className="border-border bg-background flex-row items-end gap-2 border-t px-4 pb-safe-offset-3 pt-3">
+      <View className="border-border bg-background pb-safe-offset-3 flex-row items-end gap-2 border-t px-4 pt-3">
         <TextField className="flex-1">
           <Input
             value={draft}

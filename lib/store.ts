@@ -258,9 +258,7 @@ export const useAppStore = create<AppState>()(
           passedIds: [],
           missedIds: [],
           spotsForOthers: clampSpots(spotsForOthers),
-          joins: [
-            myParticipant(spotId, profile.defaultReadyMinutes, profile.travelMode, origin),
-          ],
+          joins: [myParticipant(spotId, profile.defaultReadyMinutes, profile.travelMode, origin)],
           status: 'open',
           myResponse: 'joined',
           seen: true,
@@ -389,10 +387,7 @@ export const useAppStore = create<AppState>()(
             seen: true,
             joins: alreadyIn
               ? current.joins
-              : [
-                  ...current.joins,
-                  myParticipant(current.spotId, readyMinutes, travelMode, origin),
-                ],
+              : [...current.joins, myParticipant(current.spotId, readyMinutes, travelMode, origin)],
           })),
         }));
         return true;

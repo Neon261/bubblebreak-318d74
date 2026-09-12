@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button, Chip, Surface, Typography } from 'heroui-native';
 import { Inbox, Users } from 'lucide-react-native';
@@ -50,7 +50,7 @@ export default function InviteScreen() {
   const host = ping ? PEOPLE_BY_ID[ping.hostId] : undefined;
 
   const myKm = spot ? distanceKm(origin, spot.location) : 0;
-  const myTravel = useMemo(() => travelMinutes(myKm, travelMode), [myKm, travelMode]);
+  const myTravel = travelMinutes(myKm, travelMode);
 
   useEffect(() => {
     if (ping && !ping.seen) markSeen(ping.id);
@@ -125,12 +125,7 @@ export default function InviteScreen() {
         </View>
       </Surface>
 
-      <SpotCard
-        spot={spot}
-        distanceKm={myKm}
-        travelMinutes={myTravel}
-        travelMode={travelMode}
-      />
+      <SpotCard spot={spot} distanceKm={myKm} travelMinutes={myTravel} travelMode={travelMode} />
 
       <PingMap home={origin} spot={spot} height={180} />
 
@@ -168,7 +163,9 @@ export default function InviteScreen() {
       ) : (
         <Surface variant="default" className="gap-4 rounded-3xl p-4">
           <View className="gap-3">
-            <Typography type="body-sm" weight="medium">How will you get there?</Typography>
+            <Typography type="body-sm" weight="medium">
+              How will you get there?
+            </Typography>
             <View className="flex-row flex-wrap gap-2">
               {TRAVEL_MODES.map((mode) => (
                 <Chip

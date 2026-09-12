@@ -156,9 +156,7 @@ export default function ProfileScreen() {
               })}
             </View>
           </View>
-
         </Surface>
-
 
         <Surface variant="default" className="gap-4 rounded-3xl p-4">
           <View className="flex-row items-center gap-4">

@@ -31,7 +31,12 @@ function statusLine(ping: Ping): string {
   return `${left} ${left === 1 ? 'spot' : 'spots'} left · ${formatRelative(ping.createdAt)}`;
 }
 
-export function PingSummaryCard({ ping, myName, onPress, showDetails = false }: PingSummaryCardProps) {
+export function PingSummaryCard({
+  ping,
+  myName,
+  onPress,
+  showDetails = false,
+}: PingSummaryCardProps) {
   const spot = pingSpot(ping);
   const host = hostName(ping, myName);
   const colorClass = isHostedByMe(ping)
@@ -66,11 +71,15 @@ export function PingSummaryCard({ ping, myName, onPress, showDetails = false }: 
         {showDetails ? (
           <View className="border-border gap-1.5 border-t pt-3">
             <Typography type="body-xs">
-              <Typography type="body-xs" weight="semibold">What: </Typography>
+              <Typography type="body-xs" weight="semibold">
+                What:{' '}
+              </Typography>
               {spot?.tagline ?? 'A nearby activity'}
             </Typography>
             <Typography type="body-xs">
-              <Typography type="body-xs" weight="semibold">Where: </Typography>
+              <Typography type="body-xs" weight="semibold">
+                Where:{' '}
+              </Typography>
               {spot?.address ?? 'Shared after you join'}
             </Typography>
             <Typography type="body-xs" color="muted">
