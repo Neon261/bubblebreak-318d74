@@ -1,7 +1,24 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Button, Chip, Input, Label, Surface, Switch, TextField, Typography } from 'heroui-native';
-import { RefreshCw, Sparkles } from 'lucide-react-native';
+import {
+  BookOpen,
+  Camera,
+  Clapperboard,
+  Dumbbell,
+  Footprints,
+  Gamepad2,
+  HandHeart,
+  HeartPulse,
+  MessagesSquare,
+  MoonStar,
+  Music2,
+  Palette,
+  RefreshCw,
+  Sparkles,
+  Trees,
+  Utensils,
+} from 'lucide-react-native';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 
 import { BubbleField } from '@/components/BubbleField';
@@ -13,6 +30,23 @@ import { currentLocationLabel } from '@/lib/pings';
 import { useAppStore } from '@/lib/store';
 import { BRAND } from '@/lib/theme';
 import type { Interest } from '@/lib/types';
+
+const INTEREST_ICONS = {
+  music: Music2,
+  sports: Dumbbell,
+  food: Utensils,
+  art: Palette,
+  outdoors: Trees,
+  games: Gamepad2,
+  talks: MessagesSquare,
+  dance: Footprints,
+  cinema: Clapperboard,
+  books: BookOpen,
+  wellness: HeartPulse,
+  nightlife: MoonStar,
+  photography: Camera,
+  volunteering: HandHeart,
+} satisfies Record<Interest, typeof Music2>;
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -110,27 +144,33 @@ export default function ProfileScreen() {
           </Typography>
         </Surface>
 
-        <Surface variant="default" className="gap-3 rounded-3xl p-4">
-          <Typography type="body-sm" weight="medium">
-            What pulls you out of the house
-          </Typography>
-          <View className="flex-row flex-wrap gap-2">
+        <Surface variant="default" className="gap-4 rounded-[32px] p-5">
+          <View className="gap-1">
+            <Heading type="h4">What pulls you out of the house?</Heading>
+            <Typography type="body-xs" color="muted">
+              Pick as many as you like. We use these to sort nearby ideas.
+            </Typography>
+          </View>
+          <View className="flex-row flex-wrap gap-2.5">
             {ALL_INTERESTS.map((interest) => {
               const selected = profile.interests.includes(interest);
+              const InterestIcon = INTEREST_ICONS[interest];
               return (
                 <Chip
                   key={interest}
                   variant={selected ? 'primary' : 'tertiary'}
                   color={selected ? 'accent' : 'default'}
                   onPress={() => toggleInterest(interest)}
+                  accessibilityState={{ selected }}
                 >
+                  <InterestIcon color={selected ? BRAND.paper : BRAND.accent} size={17} />
                   <Chip.Label>{INTEREST_LABELS[interest]}</Chip.Label>
                 </Chip>
               );
             })}
           </View>
           <Typography type="body-xs" color="muted">
-            Used to sort what we suggest — you still see everything nearby.
+            {profile.interests.length} selected · You still see everything nearby.
           </Typography>
         </Surface>
 

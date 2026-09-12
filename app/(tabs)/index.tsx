@@ -203,7 +203,7 @@ export default function PingHomeScreen() {
         />
       </Surface>
 
-      <View className="relative items-center justify-center overflow-hidden rounded-[40px] py-5">
+      <View className="relative min-h-72 items-center justify-center overflow-hidden rounded-[40px] py-6">
         <BubbleField
           bubbles={[
             { size: 84, top: 4, left: 2, tint: 'teal', opacity: 0.55, drift: 9, duration: 5000 },
@@ -229,16 +229,18 @@ export default function PingHomeScreen() {
             },
           ]}
         />
+        <View className="bg-accent-soft absolute h-60 w-60 rounded-full" />
+        <View className="border-accent/20 absolute h-52 w-52 rounded-full border" />
         <Animated.View
           pointerEvents="none"
           style={[
             ringStyle,
             {
               position: 'absolute',
-              height: 208,
-              width: 208,
-              borderRadius: 104,
-              borderWidth: 2,
+              height: 240,
+              width: 240,
+              borderRadius: 120,
+              borderWidth: 1,
               borderColor: BRAND.accent,
             },
           ]}
@@ -248,8 +250,8 @@ export default function PingHomeScreen() {
           accessibilityRole="button"
           accessibilityLabel="Find something happening around me"
         >
-          <View className="bg-accent h-52 w-52 items-center justify-center gap-2 rounded-full">
-            <Radar color="#ffffff" size={40} />
+          <View className="bg-accent h-48 w-48 items-center justify-center gap-2 rounded-full">
+            <Radar color={BRAND.paper} size={36} />
             <Heading type="h4" className="text-accent-foreground">
               Get me out
             </Heading>

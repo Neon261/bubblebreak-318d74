@@ -22,7 +22,7 @@ export function SpotMap({
   radiusKm,
   selectedId,
   onSelect,
-  height = 300,
+  height = 380,
 }: SpotMapProps) {
   const markers = useMemo<MapMarker[]>(() => {
     const list: MapMarker[] = [
@@ -79,7 +79,7 @@ export function SpotMap({
 
   return (
     <View className="gap-2">
-      <View className="border-border overflow-hidden rounded-3xl border" style={{ height }}>
+      <View className="border-border overflow-hidden rounded-[36px] border" style={{ height }}>
         <MapView
           initialRegion={region}
           region={region}

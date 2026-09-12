@@ -9,6 +9,7 @@ import { IntroOptionList } from '@/components/IntroOptionList';
 import { Heading } from '@/components/Heading';
 import { cleanCustomText, type IntroCategory, type IntroQuestion } from '@/lib/introSentence';
 import { BRAND } from '@/lib/theme';
+import { cn } from '@/lib/utils';
 
 interface IntroQuestionCardProps {
   category: IntroCategory;
@@ -66,26 +67,30 @@ export function IntroQuestionCard({
   };
 
   return (
-    <View className="gap-3">
+    <View className={cn('gap-5', compact && 'gap-3')}>
       <View className="flex-row items-center justify-between gap-3">
-        <Typography type="body-xs" className="text-accent tracking-widest uppercase">
-          {category.label}
-        </Typography>
+        <View className="bg-accent-soft rounded-full px-3 py-1.5">
+          <Typography type="body-xs" className="text-accent tracking-widest uppercase">
+            {category.label}
+          </Typography>
+        </View>
         {step ? (
           <Typography type="body-xs" color="muted">
-            {step}
+            Question {step}
           </Typography>
         ) : null}
       </View>
 
-      <View className="gap-1">
-        <Heading type={compact ? 'h5' : 'h3'}>{question.prompt}</Heading>
-        <Typography type="body-xs" color="muted">
+      <View className={cn('gap-2', !compact && 'items-center px-2')}>
+        <Heading type={compact ? 'h5' : 'h3'} className={cn(!compact && 'text-center')}>
+          {question.prompt}
+        </Heading>
+        <Typography type="body-xs" color="muted" align={compact ? 'start' : 'center'}>
           {question.helper}
         </Typography>
       </View>
 
-      <Animated.View key={question.id} entering={FadeInRight.duration(220)} className="gap-3">
+      <Animated.View key={question.id} entering={FadeInRight.duration(220)} className="gap-4">
         <IntroOptionList
           question={question}
           selectedId={showField ? undefined : selectedId}

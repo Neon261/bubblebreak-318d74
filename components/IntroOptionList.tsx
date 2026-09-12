@@ -1,7 +1,6 @@
-import { Typography } from 'heroui-native';
+import { PressableFeedback, Typography } from 'heroui-native';
 import { Check } from 'lucide-react-native';
 import { View } from 'react-native';
-import { PressableFeedback } from 'heroui-native';
 
 import type { IntroQuestion } from '@/lib/introSentence';
 import { BRAND } from '@/lib/theme';
@@ -29,14 +28,25 @@ export function IntroOptionList({ question, selectedId, onSelect }: IntroOptionL
           >
             <View
               className={cn(
-                'flex-row items-center gap-3 rounded-2xl border px-4 py-3.5',
+                'min-h-20 flex-row items-center gap-4 rounded-3xl border px-5 py-4',
                 selected ? 'border-accent bg-accent-soft' : 'border-border bg-surface',
               )}
             >
-              <Typography type="body-sm" className="flex-1" weight={selected ? 'medium' : 'normal'}>
+              <Typography
+                type="body-sm"
+                className="flex-1"
+                weight={selected ? 'semibold' : 'normal'}
+              >
                 {option.label}
               </Typography>
-              {selected ? <Check color={BRAND.accent} size={18} /> : null}
+              <View
+                className={cn(
+                  'h-6 w-6 items-center justify-center rounded-lg border',
+                  selected ? 'border-accent bg-accent' : 'border-border bg-background',
+                )}
+              >
+                {selected ? <Check color={BRAND.paper} size={15} strokeWidth={3} /> : null}
+              </View>
             </View>
           </PressableFeedback>
         );

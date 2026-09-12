@@ -24,20 +24,20 @@ export function OnboardingProgress({ step, total, onBack }: OnboardingProgressPr
         </PressableFeedback>
       ) : null}
 
-      <View className="flex-row items-center gap-1.5">
+      <View className="flex-1 flex-row items-center gap-1.5">
         {Array.from({ length: total }, (_, index) => (
           <View
             key={index}
             className={cn(
-              'h-1.5 rounded-full',
-              index + 1 === step ? 'bg-accent w-6' : 'bg-default w-1.5',
+              'h-1.5 flex-1 rounded-full',
+              index + 1 <= step ? 'bg-accent' : 'bg-default',
             )}
           />
         ))}
       </View>
 
-      <Typography type="body-xs" color="muted">
-        Step {step} of {total}
+      <Typography type="body-xs" color="muted" className="shrink-0">
+        {step} of {total}
       </Typography>
     </View>
   );

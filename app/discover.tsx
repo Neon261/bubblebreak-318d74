@@ -161,6 +161,7 @@ export default function DiscoverScreen() {
             radiusKm={profile.radiusKm}
             selectedId={selected?.spot.id}
             onSelect={setSelectedId}
+            height={420}
           />
 
           {selected ? (
@@ -172,7 +173,7 @@ export default function DiscoverScreen() {
             />
           ) : null}
 
-          <Typography type="body-xs" color="muted">
+          <Typography type="body-xs" color="muted" align="center">
             Tap a pin, then tap the preview to see the details.
           </Typography>
         </View>
