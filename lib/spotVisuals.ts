@@ -24,6 +24,7 @@ import musicPhoto from '@/assets/spots/music.png';
 import outdoorsPhoto from '@/assets/spots/outdoors.png';
 import sportPhoto from '@/assets/spots/sport.png';
 import { formatClock } from '@/lib/geo';
+import { spotSourceCredit } from '@/lib/hamburgSpots';
 import { spotEndsAt, spotStartsAt } from '@/lib/mockData';
 import type { Spot, SpotCategory } from '@/lib/types';
 
@@ -129,6 +130,11 @@ export function categoryLabel(spot: Spot): string {
 export function foodLine(spot: Spot): string | undefined {
   if (!spot.cuisine) return undefined;
   return `${spot.cuisine} · ${spot.priceTier ?? PRICE_LABELS[spot.price]}`;
+}
+
+/** `Ottensen · via Geheimtipp Hamburg` — neighbourhood plus who tipped it. */
+export function neighbourhoodLine(spot: Spot): string {
+  return `${spot.district} · ${spotSourceCredit(spot)}`;
 }
 
 /** Events show the window they run in, places just say they are open. */

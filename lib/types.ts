@@ -29,6 +29,26 @@ export type SpotCategory =
 
 export type TravelMode = 'walk' | 'bike' | 'transit' | 'car';
 
+/** Where a recommendation in the Hamburg database was picked up. */
+export type SpotSourceId =
+  | 'geheimtipp'
+  | 'rausgegangen'
+  | 'mitvergnuegen'
+  | 'hamburgde'
+  | 'hamburgtourismus'
+  | 'eventbrite'
+  | 'meetup'
+  | 'kreativgesellschaft'
+  | 'community';
+
+export interface SpotSource {
+  id: SpotSourceId;
+  /** Name shown in the small credit line on a card. */
+  label: string;
+  /** One line on what kind of tips this source is good for. */
+  blurb: string;
+}
+
 /** What a plate or a round costs, for places that serve food or drinks. */
 export type PriceTier = '€' | '€€' | '€€€';
 
@@ -42,6 +62,10 @@ export interface Spot {
   tagline: string;
   description: string;
   address: string;
+  /** Hamburg neighbourhood, e.g. `Ottensen`. */
+  district: string;
+  /** Which local recommendation source this entry came from. */
+  source: SpotSourceId;
   /** Where exactly to stand when you arrive. */
   meetingHint: string;
   location: Coordinate;

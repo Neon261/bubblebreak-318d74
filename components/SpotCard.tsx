@@ -4,7 +4,13 @@ import { Image, View } from 'react-native';
 
 import { Heading } from '@/components/Heading';
 import { formatDistance, travelModeLabel } from '@/lib/geo';
-import { CATEGORY_VISUALS, categoryLabel, foodLine, timeLine } from '@/lib/spotVisuals';
+import {
+  CATEGORY_VISUALS,
+  categoryLabel,
+  foodLine,
+  neighbourhoodLine,
+  timeLine,
+} from '@/lib/spotVisuals';
 import { BRAND } from '@/lib/theme';
 import type { Spot, TravelMode } from '@/lib/types';
 
@@ -96,6 +102,10 @@ export function SpotCard({ spot, distanceKm, travelMinutes, travelMode, onPress 
             {spot.bubbleTag}
           </Typography>
         </View>
+
+        <Typography type="body-xs" color="muted" numberOfLines={1}>
+          {neighbourhoodLine(spot)}
+        </Typography>
       </View>
     </Surface>
   );
