@@ -99,6 +99,8 @@ export interface AppState {
   markVerified: (reference: string) => void;
   /** Verification passed and the person is in. */
   completeRegistration: () => void;
+  /** Deletes the local account and all session plans, returning to registration. */
+  deleteAccount: () => void;
   createPing: (spotId: string, radiusKm: number, spotsForOthers: number) => string;
   addInboundPing: (ping: Ping) => void;
   /** First come, first in: returns false when the spots are already gone. */
@@ -138,9 +140,9 @@ function patchPings(
 
 /** Who is close enough to get buzzed about a ping. */
 export function peopleInRadius(radiusKm: number, origin: Coordinate): string[] {
-  return PEOPLE.filter((person) => distanceKm(origin, person.location) <= radiusKm).map(
-    (person) => person.id,
-  );
+  return PEOPLE.filter(
+    (person) => person.notificationsEnabled && distanceKm(origin, person.location) <= radiusKm,
+  ).map((person) => person.id);
 }
 
 export function myParticipant(
@@ -249,6 +251,13 @@ export const useAppStore = create<AppState>()(
 
       completeRegistration: () =>
         set((state) => ({ profile: { ...state.profile, registeredAt: Date.now() } })),
+
+      deleteAccount: () =>
+        set({
+          profile: freshProfile(),
+          pings: {},
+          pingIds: [],
+        }),
 
       createPing: (spotId, radiusKm, spotsForOthers) => {
         const id = nextId('ping');

@@ -106,6 +106,8 @@ export interface Person {
   interests: Interest[];
   location: Coordinate;
   travelMode: TravelMode;
+  /** Whether this person can currently receive a ping notification. */
+  notificationsEnabled: boolean;
   /** How likely they are to answer a ping. */
   vibe: 'eager' | 'maybe' | 'quiet';
 }

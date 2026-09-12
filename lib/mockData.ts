@@ -59,7 +59,7 @@ export function spotEndsAt(spot: Spot): number | undefined {
   return startsAt + spot.runsForMinutes * 60_000;
 }
 
-export const PEOPLE: Person[] = [
+const PEOPLE_WITHOUT_NOTIFICATION_STATUS: Omit<Person, 'notificationsEnabled'>[] = [
   {
     id: 'p-yara',
     name: 'Yara',
@@ -241,6 +241,28 @@ export const PEOPLE: Person[] = [
     vibe: 'quiet',
   },
 ];
+
+const NOTIFICATIONS_ENABLED = new Set([
+  'p-yara',
+  'p-tomas',
+  'p-aicha',
+  'p-bo',
+  'p-malik',
+  'p-sena',
+  'p-paulo',
+  'p-nour',
+  'p-reva',
+  'p-fabi',
+  'p-dmitri',
+  'p-lea',
+  'p-mira',
+]);
+
+/** Simulated neighbours, including whether their phone can currently receive a ping. */
+export const PEOPLE: Person[] = PEOPLE_WITHOUT_NOTIFICATION_STATUS.map((person) => ({
+  ...person,
+  notificationsEnabled: NOTIFICATIONS_ENABLED.has(person.id),
+}));
 
 export const PEOPLE_BY_ID: Record<string, Person> = Object.fromEntries(
   PEOPLE.map((person) => [person.id, person]),

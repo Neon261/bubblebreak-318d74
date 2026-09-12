@@ -1,6 +1,16 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
-import { Button, Chip, Input, Label, Surface, Switch, TextField, Typography } from 'heroui-native';
+import {
+  Button,
+  Chip,
+  Dialog,
+  Input,
+  Label,
+  Surface,
+  Switch,
+  TextField,
+  Typography,
+} from 'heroui-native';
 import {
   BookOpen,
   Camera,
@@ -54,8 +64,16 @@ export default function ProfileScreen() {
   const updateProfile = useAppStore((state) => state.updateProfile);
   const setFirstName = useAppStore((state) => state.setFirstName);
   const shuffleIntro = useAppStore((state) => state.shuffleIntro);
+  const deleteAccount = useAppStore((state) => state.deleteAccount);
 
   const [nameDraft, setNameDraft] = useState(profile.firstName);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const confirmDeleteAccount = () => {
+    setIsDeleteDialogOpen(false);
+    deleteAccount();
+    router.replace('/onboarding');
+  };
 
   const toggleInterest = (interest: Interest) => {
     const has = profile.interests.includes(interest);
@@ -208,6 +226,45 @@ export default function ProfileScreen() {
               <Switch.Thumb />
             </Switch>
           </View>
+        </Surface>
+
+        <Surface variant="default" className="gap-3 rounded-3xl p-4">
+          <View className="gap-1">
+            <Typography type="body-sm" weight="medium">
+              Start over
+            </Typography>
+            <Typography type="body-xs" color="muted">
+              Delete your profile, answers, invitations, and plans from this device.
+            </Typography>
+          </View>
+          <Dialog isOpen={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <Dialog.Trigger asChild>
+              <Button variant="danger-soft">
+                <Button.Label>Delete account</Button.Label>
+              </Button>
+            </Dialog.Trigger>
+            <Dialog.Portal>
+              <Dialog.Overlay />
+              <Dialog.Content>
+                <Dialog.Close variant="ghost" />
+                <View className="mb-5 gap-1.5 pr-8">
+                  <Dialog.Title>Delete your account?</Dialog.Title>
+                  <Dialog.Description>
+                    This removes your profile and all activity from this device. You will return to
+                    registration and cannot undo this.
+                  </Dialog.Description>
+                </View>
+                <View className="flex-row justify-end gap-3">
+                  <Button variant="ghost" size="sm" onPress={() => setIsDeleteDialogOpen(false)}>
+                    <Button.Label>Keep account</Button.Label>
+                  </Button>
+                  <Button variant="danger" size="sm" onPress={confirmDeleteAccount}>
+                    <Button.Label>Delete account</Button.Label>
+                  </Button>
+                </View>
+              </Dialog.Content>
+            </Dialog.Portal>
+          </Dialog>
         </Surface>
       </ScrollView>
     </KeyboardAvoidingView>

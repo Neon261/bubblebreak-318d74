@@ -18,8 +18,7 @@ import { BubbleField } from '@/components/BubbleField';
 import { Heading, Wordmark } from '@/components/Heading';
 import { RadiusSlider } from '@/components/RadiusSlider';
 import { useTicker } from '@/hooks/useTicker';
-import { distanceKm, formatClock, formatCountdown } from '@/lib/geo';
-import { SPOTS } from '@/lib/mockData';
+import { formatClock, formatCountdown } from '@/lib/geo';
 import {
   currentLocation,
   currentLocationLabel,
@@ -32,7 +31,7 @@ import {
   pingSpot,
   spotsTaken,
 } from '@/lib/pings';
-import { useAppStore } from '@/lib/store';
+import { peopleInRadius, useAppStore } from '@/lib/store';
 import { BRAND } from '@/lib/theme';
 import type { Coordinate, LocationDetails } from '@/lib/types';
 
@@ -104,8 +103,8 @@ export default function PingHomeScreen() {
     };
   }, [profile.location, profile.locationDetails, profile.locationPermission, setLocation]);
 
-  const nearbySpots = useMemo(
-    () => SPOTS.filter((spot) => distanceKm(origin, spot.location) <= profile.radiusKm).length,
+  const reachablePeople = useMemo(
+    () => peopleInRadius(profile.radiusKm, origin).length,
     [origin, profile.radiusKm],
   );
 
@@ -248,15 +247,16 @@ export default function PingHomeScreen() {
         <PressableFeedback
           onPress={() => router.push('/discover')}
           accessibilityRole="button"
-          accessibilityLabel="Find something happening around me"
+          accessibilityLabel={`Meet someone and reach ${reachablePeople} ${reachablePeople === 1 ? 'person' : 'people'} with notifications on`}
         >
           <View className="bg-accent h-48 w-48 items-center justify-center gap-2 rounded-full">
             <Radar color={BRAND.paper} size={36} />
             <Heading type="h4" className="text-accent-foreground">
-              Get me out
+              Meet someone
             </Heading>
             <Typography type="body-xs" align="center" className="text-accent-foreground px-8">
-              {nearbySpots} places within {profile.radiusKm} km
+              {reachablePeople} {reachablePeople === 1 ? 'person has' : 'people have'} notifications
+              on
             </Typography>
           </View>
         </PressableFeedback>
