@@ -13,7 +13,7 @@ import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
 import { useEffect } from 'react';
 import * as DevClient from 'expo-dev-client';
-import { HeroUINativeProvider } from 'heroui-native';
+import { HeroUINativeProvider, useThemeColor } from 'heroui-native';
 import { Uniwind } from 'uniwind';
 import {
   ErrorBoundary as ExpoErrorBoundary,
@@ -26,6 +26,7 @@ import { initPostHog } from '@/lib/posthog';
 import { registerServiceWorker } from '@/lib/registerServiceWorker';
 import { reportErrorToParent } from '@/lib/reportPreviewError';
 import { InstallPrompt } from '@/components/InstallPrompt';
+import { useSession } from '@/hooks/useSession';
 
 /**
  * Custom ErrorBoundary that reports React render errors to the parent window (Bilt preview iframe)
@@ -141,11 +142,33 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <HeroUINativeProvider>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ title: 'Habits', headerShown: false }} />
-        </Stack>
+        <AppStack />
         <InstallPrompt />
       </HeroUINativeProvider>
     </GestureHandlerRootView>
+  );
+}
+
+function AppStack() {
+  const [background, foreground] = useThemeColor(['background', 'foreground']);
+  useSession();
+
+  return (
+    <Stack
+      screenOptions={{
+        headerStyle: { backgroundColor: background },
+        headerTintColor: foreground,
+        headerTitleStyle: { color: foreground },
+        headerShadowVisible: false,
+        headerBackTitle: 'Back',
+        contentStyle: { backgroundColor: background },
+      }}
+    >
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="discover" options={{ title: 'Around you' }} />
+      <Stack.Screen name="ping/[id]" options={{ title: 'Your ping' }} />
+      <Stack.Screen name="invite/[id]" options={{ title: 'Invitation' }} />
+      <Stack.Screen name="plan/[id]" options={{ title: 'The plan' }} />
+    </Stack>
   );
 }
