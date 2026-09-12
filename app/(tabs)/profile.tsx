@@ -8,7 +8,6 @@ import { BubbleField } from '@/components/BubbleField';
 import { Heading } from '@/components/Heading';
 import { PersonAvatar } from '@/components/PersonAvatar';
 import { VerifiedBadge } from '@/components/VerifiedBadge';
-import { TRAVEL_MODES, travelModeLabel } from '@/lib/geo';
 import { ALL_INTERESTS, INTEREST_LABELS } from '@/lib/mockData';
 import { currentLocationLabel } from '@/lib/pings';
 import { useAppStore } from '@/lib/store';
@@ -133,29 +132,6 @@ export default function ProfileScreen() {
           <Typography type="body-xs" color="muted">
             Used to sort what we suggest — you still see everything nearby.
           </Typography>
-        </Surface>
-
-        <Surface variant="default" className="gap-4 rounded-3xl p-4">
-          <View className="gap-3">
-            <Typography type="body-sm" weight="medium">
-              How you usually get around
-            </Typography>
-            <View className="flex-row flex-wrap gap-2">
-              {TRAVEL_MODES.map((mode) => {
-                const selected = profile.travelMode === mode;
-                return (
-                  <Chip
-                    key={mode}
-                    variant={selected ? 'primary' : 'tertiary'}
-                    color={selected ? 'accent' : 'default'}
-                    onPress={() => updateProfile({ travelMode: mode })}
-                  >
-                    <Chip.Label>{travelModeLabel(mode)}</Chip.Label>
-                  </Chip>
-                );
-              })}
-            </View>
-          </View>
         </Surface>
 
         <Surface variant="default" className="gap-4 rounded-3xl p-4">
