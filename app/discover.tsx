@@ -38,6 +38,7 @@ export default function DiscoverScreen() {
   const [mode, setMode] = useState<ViewMode>('map');
   const [offset, setOffset] = useState(0);
   const [selectedId, setSelectedId] = useState<string>();
+  const [selectedSpots, setSelectedSpots] = useState<number>();
 
   const profile = useAppStore((state) => state.profile);
   const updateProfile = useAppStore((state) => state.updateProfile);
@@ -68,17 +69,18 @@ export default function DiscoverScreen() {
     return Array.from({ length: BATCH }, (_, index) => items[(offset + index) % items.length]);
   }, [items, offset]);
 
-  const selected = shown.find((item) => item.spot.id === selectedId) ?? shown[0];
+  const selected = shown.find((item) => item.spot.id === selectedId);
   const canRotate = items.length > BATCH;
-  const spots = clampSpots(profile.defaultSpots);
 
   const rotate = () => {
     setOffset((current) => (current + BATCH) % items.length);
     setSelectedId(undefined);
   };
 
-  const choose = (spotId: string) => {
-    const id = createPing(spotId, profile.radiusKm, spots);
+  const submit = () => {
+    if (!selectedId || selectedSpots === undefined) return;
+
+    const id = createPing(selectedId, profile.radiusKm, clampSpots(selectedSpots));
     startPingSimulation(id);
     router.replace({ pathname: '/ping/[id]', params: { id } });
   };
@@ -99,6 +101,13 @@ export default function DiscoverScreen() {
           Choose one and everyone nearby with the app hears about it.
         </Typography>
       </View>
+
+      <Surface variant="default" className="rounded-3xl p-4">
+        <RadiusSlider
+          radiusKm={profile.radiusKm}
+          onChange={(km) => updateProfile({ radiusKm: km })}
+        />
+      </Surface>
 
       <View className="flex-row flex-wrap gap-2">
         {FILTERS.map((item) => {
@@ -167,7 +176,6 @@ export default function DiscoverScreen() {
               spot={selected.spot}
               distanceKm={selected.km}
               travelMinutes={travelMinutes(selected.km, profile.travelMode)}
-              onChoose={() => choose(selected.spot.id)}
             />
           ) : null}
 
@@ -184,23 +192,31 @@ export default function DiscoverScreen() {
               distanceKm={item.km}
               travelMinutes={travelMinutes(item.km, profile.travelMode)}
               travelMode={profile.travelMode}
-              onPress={() => choose(item.spot.id)}
+              selected={selectedId === item.spot.id}
+              onPress={() => setSelectedId(item.spot.id)}
             />
           ))}
         </View>
       )}
 
-      <Surface variant="default" className="gap-4 rounded-3xl p-4">
+      <Surface variant="default" className="rounded-3xl p-4">
         <GroupSizePicker
-          value={spots}
-          onChange={(count) => updateProfile({ defaultSpots: count })}
-          hint={`A group of ${spots + 1} in total. The first ${spots} ${spots === 1 ? 'person' : 'people'} to say yes are in, the rest get told the spots went.`}
-        />
-        <RadiusSlider
-          radiusKm={profile.radiusKm}
-          onChange={(km) => updateProfile({ radiusKm: km })}
+          value={selectedSpots ?? 0}
+          onChange={(count) => {
+            setSelectedSpots(count);
+            updateProfile({ defaultSpots: count });
+          }}
+          hint={
+            selectedSpots === undefined
+              ? 'Choose how many people can join before submitting.'
+              : `A group of ${selectedSpots + 1} in total. The first ${selectedSpots} ${selectedSpots === 1 ? 'person' : 'people'} to say yes are in, the rest get told the spots went.`
+          }
         />
       </Surface>
+
+      <Button size="lg" isDisabled={!selectedId || selectedSpots === undefined} onPress={submit}>
+        <Button.Label>Submit</Button.Label>
+      </Button>
     </ScrollView>
   );
 }

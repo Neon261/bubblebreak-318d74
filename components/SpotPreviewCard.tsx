@@ -1,4 +1,4 @@
-import { Button, Surface, Typography } from 'heroui-native';
+import { Surface, Typography } from 'heroui-native';
 import { MapPin } from 'lucide-react-native';
 import { Image, View } from 'react-native';
 
@@ -18,18 +18,12 @@ interface SpotPreviewCardProps {
   spot: Spot;
   distanceKm: number;
   travelMinutes: number;
-  onChoose: () => void;
 }
 
 const THUMB = 92;
 
 /** The card under the map, describing whichever pin is selected. */
-export function SpotPreviewCard({
-  spot,
-  distanceKm,
-  travelMinutes,
-  onChoose,
-}: SpotPreviewCardProps) {
+export function SpotPreviewCard({ spot, distanceKm, travelMinutes }: SpotPreviewCardProps) {
   const visual = CATEGORY_VISUALS[spot.category];
   const Icon = visual.icon;
   const food = foodLine(spot);
@@ -74,10 +68,6 @@ export function SpotPreviewCard({
           </Typography>
         </View>
       </View>
-
-      <Button size="sm" onPress={onChoose}>
-        <Button.Label>Ping this one</Button.Label>
-      </Button>
     </Surface>
   );
 }

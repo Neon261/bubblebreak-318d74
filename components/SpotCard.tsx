@@ -19,18 +19,29 @@ interface SpotCardProps {
   distanceKm: number;
   travelMinutes?: number;
   travelMode?: TravelMode;
+  selected?: boolean;
   onPress?: () => void;
 }
 
 const PHOTO_HEIGHT = 150;
 
-export function SpotCard({ spot, distanceKm, travelMinutes, travelMode, onPress }: SpotCardProps) {
+export function SpotCard({
+  spot,
+  distanceKm,
+  travelMinutes,
+  travelMode,
+  selected = false,
+  onPress,
+}: SpotCardProps) {
   const visual = CATEGORY_VISUALS[spot.category];
   const Icon = visual.icon;
   const food = foodLine(spot);
 
   const content = (
-    <Surface variant="default" className="overflow-hidden rounded-3xl p-0">
+    <Surface
+      variant="default"
+      className={`overflow-hidden rounded-3xl border-2 p-0 ${selected ? 'border-accent' : 'border-transparent'}`}
+    >
       <View style={{ height: PHOTO_HEIGHT, width: '100%' }}>
         <Image
           source={visual.photo}
