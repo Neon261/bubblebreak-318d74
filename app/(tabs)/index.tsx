@@ -93,6 +93,9 @@ export default function PingHomeScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View className="gap-1">
+        <Typography type="body-xs" color="muted" className="tracking-widest uppercase">
+          RandoGather
+        </Typography>
         <Typography type="h2">Out of your bubble</Typography>
         <View className="flex-row items-center gap-1.5">
           <MapPin color={accent} size={14} />

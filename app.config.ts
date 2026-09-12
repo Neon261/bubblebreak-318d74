@@ -10,12 +10,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   return {
     ...config,
-    name: 'BubbleBreak',
-    slug: 'bubblebreak',
+    name: 'RandoGather',
+    slug: 'randogather',
     version: process.env.BILT_APP_VERSION ?? '1.0.0',
     orientation: 'portrait',
     userInterfaceStyle: 'automatic',
-    scheme: 'bubblebreak',
+    scheme: 'randogather',
     runtimeVersion: {
       policy: 'appVersion',
     },
@@ -25,10 +25,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         ITSAppUsesNonExemptEncryption: false,
       },
       supportsTablet: true,
-      bundleIdentifier: process.env.BILT_IOS_BUNDLE_ID ?? 'me.bilt.bubblebreak',
+      bundleIdentifier: process.env.BILT_IOS_BUNDLE_ID ?? 'me.bilt.randogather',
     },
     android: {
-      package: process.env.BILT_ANDROID_PACKAGE ?? 'me.bilt.bubblebreak',
+      package: process.env.BILT_ANDROID_PACKAGE ?? 'me.bilt.randogather',
     },
     web: {
       bundler: 'metro',
