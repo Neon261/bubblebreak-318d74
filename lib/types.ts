@@ -103,11 +103,17 @@ export interface Ping {
   seen: boolean;
 }
 
-/** The five things the app asks during registration. */
-export type IntroQuestionId = 'pull' | 'talent' | 'strangers' | 'object' | 'ending';
+/** The five sides of a person the app asks about during registration. */
+export type IntroCategoryId = 'doing' | 'personality' | 'funfact' | 'hobby' | 'signature';
 
-/** Question id -> chosen option id. */
-export type IntroAnswers = Partial<Record<IntroQuestionId, string>>;
+/** Which question from a group is on screen, and the option chosen for it. */
+export interface IntroPick {
+  questionId: string;
+  optionId?: string;
+}
+
+/** Category id -> the question drawn for it plus the answer. */
+export type IntroAnswers = Partial<Record<IntroCategoryId, IntroPick>>;
 
 export type VerificationStatus = 'unverified' | 'verified';
 

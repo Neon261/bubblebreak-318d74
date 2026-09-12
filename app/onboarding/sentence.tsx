@@ -5,6 +5,7 @@ import { ScrollView, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { OnboardingProgress } from '@/components/OnboardingProgress';
+import { hasAllIntroAnswers } from '@/lib/introSentence';
 import { goBackOrReplace } from '@/lib/navigation';
 import { useAppStore } from '@/lib/store';
 
@@ -12,10 +13,11 @@ export default function OnboardingSentenceScreen() {
   const router = useRouter();
   const [accent] = useThemeColor(['accent']);
   const intro = useAppStore((state) => state.profile.intro);
+  const answers = useAppStore((state) => state.profile.introAnswers);
   const shuffleIntro = useAppStore((state) => state.shuffleIntro);
 
-  // Reachable directly by link before the questions are answered.
-  if (!intro) return <Redirect href="/onboarding/questions" />;
+  // Reachable directly by link, and a swapped question leaves a topic blank.
+  if (!intro || !hasAllIntroAnswers(answers)) return <Redirect href="/onboarding/questions" />;
 
   return (
     <ScrollView

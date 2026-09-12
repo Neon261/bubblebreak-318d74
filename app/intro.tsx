@@ -3,8 +3,8 @@ import { RefreshCw, Sparkles } from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
-import { IntroOptionList } from '@/components/IntroOptionList';
-import { INTRO_QUESTIONS } from '@/lib/introSentence';
+import { IntroQuestionCard } from '@/components/IntroQuestionCard';
+import { currentIntroQuestion, hasAllIntroAnswers, INTRO_CATEGORIES } from '@/lib/introSentence';
 import { goBackOrReplace } from '@/lib/navigation';
 import { useAppStore } from '@/lib/store';
 
@@ -14,12 +14,15 @@ export default function IntroEditorScreen() {
   const intro = useAppStore((state) => state.profile.intro);
   const answers = useAppStore((state) => state.profile.introAnswers);
   const setIntroAnswer = useAppStore((state) => state.setIntroAnswer);
+  const switchIntroQuestion = useAppStore((state) => state.switchIntroQuestion);
   const shuffleIntro = useAppStore((state) => state.shuffleIntro);
+
+  const complete = hasAllIntroAnswers(answers);
 
   return (
     <ScrollView
       className="bg-background flex-1"
-      contentContainerClassName="gap-6 px-5 pb-12 pt-4"
+      contentContainerClassName="gap-7 px-5 pb-12 pt-4"
       showsVerticalScrollIndicator={false}
     >
       <Surface variant="secondary" className="gap-3 rounded-3xl p-5">
@@ -32,6 +35,11 @@ export default function IntroEditorScreen() {
         <Animated.View key={intro} entering={FadeIn.duration(240)}>
           <Typography type="h5">{intro}</Typography>
         </Animated.View>
+        {complete ? null : (
+          <Typography type="body-xs" color="muted">
+            You swapped a question — pick an answer below and the sentence updates.
+          </Typography>
+        )}
         <Button variant="tertiary" onPress={shuffleIntro}>
           <Button.Label>
             <View className="flex-row items-center gap-2">
@@ -44,23 +52,21 @@ export default function IntroEditorScreen() {
         </Button>
       </Surface>
 
-      {INTRO_QUESTIONS.map((question) => (
-        <View key={question.id} className="gap-3">
-          <View className="gap-0.5">
-            <Typography type="body-sm" weight="semibold">
-              {question.prompt}
-            </Typography>
-            <Typography type="body-xs" color="muted">
-              {question.helper}
-            </Typography>
-          </View>
-          <IntroOptionList
+      {INTRO_CATEGORIES.map((category) => {
+        const question = currentIntroQuestion(category.id, answers);
+        if (!question) return null;
+        return (
+          <IntroQuestionCard
+            key={category.id}
+            compact
+            category={category}
             question={question}
-            selectedId={answers[question.id]}
-            onSelect={(optionId) => setIntroAnswer(question.id, optionId)}
+            selectedId={answers[category.id]?.optionId}
+            onSelect={(optionId) => setIntroAnswer(category.id, optionId)}
+            onSwitch={() => switchIntroQuestion(category.id)}
           />
-        </View>
-      ))}
+        );
+      })}
 
       <Button onPress={() => goBackOrReplace('/(tabs)/profile')}>
         <Button.Label>Done</Button.Label>

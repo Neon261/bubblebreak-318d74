@@ -1,12 +1,17 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Typography } from 'heroui-native';
-import { ScrollView, View } from 'react-native';
-import Animated, { FadeInRight } from 'react-native-reanimated';
+import { ScrollView } from 'react-native';
 
-import { IntroOptionList } from '@/components/IntroOptionList';
+import { IntroQuestionCard } from '@/components/IntroQuestionCard';
 import { OnboardingProgress } from '@/components/OnboardingProgress';
-import { firstUnansweredIndex, INTRO_QUESTIONS } from '@/lib/introSentence';
+import {
+  currentIntroQuestion,
+  firstUnansweredIndex,
+  hasAllIntroAnswers,
+  INTRO_CATEGORIES,
+  INTRO_CATEGORY_COUNT,
+} from '@/lib/introSentence';
 import { goBackOrReplace } from '@/lib/navigation';
 import { useAppStore } from '@/lib/store';
 
@@ -15,20 +20,25 @@ export default function OnboardingQuestionsScreen() {
   const firstName = useAppStore((state) => state.profile.firstName);
   const answers = useAppStore((state) => state.profile.introAnswers);
   const setIntroAnswer = useAppStore((state) => state.setIntroAnswer);
+  const switchIntroQuestion = useAppStore((state) => state.switchIntroQuestion);
 
   const [index, setIndex] = useState(() =>
-    Math.min(firstUnansweredIndex(answers), INTRO_QUESTIONS.length - 1),
+    Math.min(firstUnansweredIndex(answers), INTRO_CATEGORY_COUNT - 1),
   );
 
-  const question = INTRO_QUESTIONS[index];
+  const category = INTRO_CATEGORIES[index];
+  if (!category) return null;
+
+  const question = currentIntroQuestion(category.id, answers);
   if (!question) return null;
 
-  const isLast = index === INTRO_QUESTIONS.length - 1;
-
   const select = (optionId: string) => {
-    setIntroAnswer(question.id, optionId);
-    if (isLast) router.push('/onboarding/sentence');
-    else setIndex(index + 1);
+    setIntroAnswer(category.id, optionId);
+    const next = { ...answers, [category.id]: { questionId: question.id, optionId } };
+    // Switching a question drops its answer, so the next stop is whatever is
+    // still blank rather than simply the group after this one.
+    if (hasAllIntroAnswers(next)) router.push('/onboarding/sentence');
+    else setIndex(Math.min(firstUnansweredIndex(next), INTRO_CATEGORY_COUNT - 1));
   };
 
   const back = () => {
@@ -44,22 +54,22 @@ export default function OnboardingQuestionsScreen() {
     >
       <OnboardingProgress step={2} total={4} onBack={back} />
 
-      <View className="gap-2">
-        <Typography type="body-xs" color="muted" className="tracking-widest uppercase">
-          Question {index + 1} of {INTRO_QUESTIONS.length}
-        </Typography>
-        <Typography type="h3">{question.prompt}</Typography>
-        <Typography type="body-sm" color="muted">
-          {question.helper}
-        </Typography>
-      </View>
+      <Typography type="body-xs" color="muted" className="tracking-widest uppercase">
+        Five topics, five taps
+      </Typography>
 
-      <Animated.View key={question.id} entering={FadeInRight.duration(220)}>
-        <IntroOptionList question={question} selectedId={answers[question.id]} onSelect={select} />
-      </Animated.View>
+      <IntroQuestionCard
+        category={category}
+        question={question}
+        selectedId={answers[category.id]?.optionId}
+        onSelect={select}
+        onSwitch={() => switchIntroQuestion(category.id)}
+        step={`${index + 1} of ${INTRO_CATEGORY_COUNT}`}
+      />
 
       <Typography type="body-xs" color="muted">
-        {firstName}, these five taps become one sentence. Nothing else about you is shown.
+        {firstName}, one question per topic, drawn at random. Do not like one? Swap it for another
+        from the same topic. All five become a single sentence — nothing else about you is shown.
       </Typography>
     </ScrollView>
   );

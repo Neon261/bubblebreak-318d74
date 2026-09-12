@@ -3,11 +3,18 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { computeMeetAt, distanceKm, travelMinutes } from '@/lib/geo';
-import { buildIntroSentence, INTRO_TEMPLATE_COUNT } from '@/lib/introSentence';
+import {
+  buildIntroSentence,
+  currentIntroQuestion,
+  INTRO_TEMPLATE_COUNT,
+  randomIntroPicks,
+  switchedIntroPick,
+  withIntroPicks,
+} from '@/lib/introSentence';
 import { HOME, PEOPLE, SPOTS_BY_ID } from '@/lib/mockData';
 import { clampSpots, spotsLeft, spotsTaken } from '@/lib/pings';
 import {
-  type IntroQuestionId,
+  type IntroCategoryId,
   ME,
   type Participant,
   type Ping,
@@ -32,12 +39,19 @@ const DEFAULT_PROFILE: Profile = {
   verification: { status: 'unverified' },
 };
 
-/** Keeps the shown sentence in step with the name and the answers behind it. */
+/**
+ * Keeps the shown sentence in step with the name and the answers behind it.
+ * A half-finished set of answers leaves the last good sentence in place, so
+ * switching a question in the editor does not blank the profile.
+ */
 function withIntro(profile: Profile): Profile {
-  return {
-    ...profile,
-    intro: buildIntroSentence(profile.firstName, profile.introAnswers, profile.introVariant),
-  };
+  const intro = buildIntroSentence(profile.firstName, profile.introAnswers, profile.introVariant);
+  return { ...profile, intro: intro || profile.intro };
+}
+
+/** A brand new person: no answers yet, one random question drawn per group. */
+function freshProfile(): Profile {
+  return { ...DEFAULT_PROFILE, introAnswers: randomIntroPicks() };
 }
 
 function hasPersistedProfile(value: unknown): value is { profile: Partial<Profile> } {
@@ -58,8 +72,10 @@ export interface AppState {
   updateProfile: (patch: Partial<Profile>) => void;
   /** Registration step 1. */
   setFirstName: (firstName: string) => void;
-  /** Registration step 2: one of the five questions gets answered. */
-  setIntroAnswer: (questionId: IntroQuestionId, optionId: string) => void;
+  /** Registration step 2: answers the question currently shown for a group. */
+  setIntroAnswer: (categoryId: IntroCategoryId, optionId: string) => void;
+  /** Draws another question from the same group and clears that answer. */
+  switchIntroQuestion: (categoryId: IntroCategoryId) => void;
   /** Re-word the same answers. */
   shuffleIntro: () => void;
   /** Registration step 3: the outside provider came back with a pass. */
@@ -128,7 +144,7 @@ export function myParticipant(
 export const useAppStore = create<AppState>()(
   persist<AppState, [], [], Pick<AppState, 'profile'>>(
     (set, get) => ({
-      profile: DEFAULT_PROFILE,
+      profile: freshProfile(),
       pings: {},
       pingIds: [],
 
@@ -137,13 +153,32 @@ export const useAppStore = create<AppState>()(
       setFirstName: (firstName) =>
         set((state) => ({ profile: withIntro({ ...state.profile, firstName: firstName.trim() }) })),
 
-      setIntroAnswer: (questionId, optionId) =>
-        set((state) => ({
-          profile: withIntro({
-            ...state.profile,
-            introAnswers: { ...state.profile.introAnswers, [questionId]: optionId },
-          }),
-        })),
+      setIntroAnswer: (categoryId, optionId) =>
+        set((state) => {
+          const question = currentIntroQuestion(categoryId, state.profile.introAnswers);
+          if (!question) return {};
+          return {
+            profile: withIntro({
+              ...state.profile,
+              introAnswers: {
+                ...state.profile.introAnswers,
+                [categoryId]: { questionId: question.id, optionId },
+              },
+            }),
+          };
+        }),
+
+      switchIntroQuestion: (categoryId) =>
+        set((state) => {
+          const pick = switchedIntroPick(categoryId, state.profile.introAnswers);
+          if (!pick) return {};
+          return {
+            profile: withIntro({
+              ...state.profile,
+              introAnswers: { ...state.profile.introAnswers, [categoryId]: pick },
+            }),
+          };
+        }),
 
       shuffleIntro: () =>
         set((state) => ({
@@ -313,16 +348,21 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'bubble-store',
-      version: 2,
+      version: 3,
       storage: createJSONStorage(() => AsyncStorage),
       // Live pings are session state; only the profile is worth keeping.
       partialize: (state) => ({ profile: state.profile }),
-      // Profiles saved before registration existed have no name, sentence or
-      // verification, so they start the flow from the top.
-      migrate: () => ({ profile: DEFAULT_PROFILE }),
+      // Older profiles answered a fixed question list that no longer exists,
+      // so they start registration from the top with a fresh draw.
+      migrate: () => ({ profile: freshProfile() }),
       merge: (persisted, current) => {
         const saved = hasPersistedProfile(persisted) ? persisted.profile : undefined;
-        return { ...current, profile: { ...DEFAULT_PROFILE, ...saved } };
+        const profile: Profile = { ...DEFAULT_PROFILE, ...saved };
+        // Fills any group whose question went missing, keeping real answers.
+        return {
+          ...current,
+          profile: { ...profile, introAnswers: withIntroPicks(profile.introAnswers) },
+        };
       },
     },
   ),
