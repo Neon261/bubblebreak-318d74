@@ -173,12 +173,6 @@ export default function PingHomeScreen() {
         <Heading type="h2" className="max-w-64">
           Out of your bubble
         </Heading>
-        <View className="flex-row items-center gap-1.5">
-          <MapPin color={BRAND.accent} size={14} />
-          <Typography type="body-sm" color="muted">
-            {locationLabel}
-          </Typography>
-        </View>
       </View>
 
       <Surface variant="default" className="border-border gap-3 rounded-3xl border p-3">
