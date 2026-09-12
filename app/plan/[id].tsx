@@ -156,6 +156,12 @@ export default function PlanScreen() {
             isHost={participant.personId === ping.hostId}
           />
         ))}
+        {ping.missedIds.length > 0 ? (
+          <Typography type="body-xs" color="muted" className="pt-1">
+            Kept to {ping.spotsForOthers + 1} people · {ping.missedIds.length}{' '}
+            {ping.missedIds.length === 1 ? 'person' : 'people'} wanted in after the spots went.
+          </Typography>
+        ) : null}
       </Surface>
 
       {ping.meetAt && slowest ? (

@@ -15,11 +15,13 @@ import { RefreshCw, Sparkles } from 'lucide-react-native';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 
 import { PersonAvatar } from '@/components/PersonAvatar';
+import { GroupSizePicker } from '@/components/GroupSizePicker';
 import { RadiusSlider } from '@/components/RadiusSlider';
 import { ReadyPicker } from '@/components/ReadyPicker';
 import { VerifiedBadge } from '@/components/VerifiedBadge';
 import { TRAVEL_MODES, travelModeLabel } from '@/lib/geo';
 import { ALL_INTERESTS, HOME, INTEREST_LABELS } from '@/lib/mockData';
+import { clampSpots } from '@/lib/pings';
 import { peopleInRadius, useAppStore } from '@/lib/store';
 import type { Interest } from '@/lib/types';
 
@@ -169,6 +171,13 @@ export default function ProfileScreen() {
             onChange={(minutes) => updateProfile({ defaultReadyMinutes: minutes })}
             label="Your usual head start"
             hint="Pre-filled when you join something. You can change it every time."
+          />
+
+          <GroupSizePicker
+            value={clampSpots(profile.defaultSpots)}
+            onChange={(count) => updateProfile({ defaultSpots: count })}
+            label="How big your groups get"
+            hint={`Pings you start let ${clampSpots(profile.defaultSpots)} ${clampSpots(profile.defaultSpots) === 1 ? 'person' : 'people'} in besides you. You can change it per ping.`}
           />
         </Surface>
 

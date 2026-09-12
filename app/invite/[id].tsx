@@ -22,7 +22,7 @@ import {
 } from '@/lib/geo';
 import { HOME, PEOPLE_BY_ID } from '@/lib/mockData';
 import { goBackOrReplace } from '@/lib/navigation';
-import { hostName, pingSpot } from '@/lib/pings';
+import { hostName, pingSpot, spotsLeft } from '@/lib/pings';
 import { scheduleHostPlan } from '@/lib/simulation';
 import { useAppStore } from '@/lib/store';
 import type { ReadyMinutes } from '@/lib/types';
@@ -76,7 +76,8 @@ export default function InviteScreen() {
   }
 
   const join = () => {
-    joinInbound(ping.id, ready, profile.travelMode);
+    // First come, first in: somebody may have taken the last spot while I looked.
+    if (!joinInbound(ping.id, ready, profile.travelMode)) return;
     scheduleHostPlan(ping.id);
     router.replace({ pathname: '/plan/[id]', params: { id: ping.id } });
   };
@@ -86,6 +87,8 @@ export default function InviteScreen() {
     goBackOrReplace('/(tabs)/invites');
   };
 
+  const left = spotsLeft(ping);
+  const full = left === 0;
   const arrival = now + (ready + myTravel) * 60_000;
 
   return (
@@ -130,7 +133,7 @@ export default function InviteScreen() {
         <View className="flex-row items-center gap-2 pb-1">
           <Users color={accent} size={16} />
           <Typography type="body-sm" weight="semibold">
-            Already in
+            Already in · {ping.joins.length} of {ping.spotsForOthers + 1}
           </Typography>
         </View>
         {ping.joins.map((participant) => (
@@ -141,29 +144,53 @@ export default function InviteScreen() {
             isHost={participant.personId === ping.hostId}
           />
         ))}
+        <Typography type="body-xs" color="muted" className="pt-1">
+          {full
+            ? `${hostName(ping, profile.firstName)} kept it to ${ping.spotsForOthers + 1} people and the spots are gone.`
+            : `${left} ${left === 1 ? 'spot' : 'spots'} left — whoever says yes first is in.`}
+        </Typography>
       </Surface>
 
-      <Surface variant="default" className="gap-4 rounded-3xl p-4">
-        <ReadyPicker
-          value={ready}
-          onChange={setReady}
-          hint={`You are ${formatDistance(myKm)} from there — about ${myTravel} min ${travelModeLabel(profile.travelMode)}.`}
-        />
-        <View className="bg-accent-soft rounded-2xl px-3 py-2">
-          <Typography type="body-sm" className="text-accent-soft-foreground">
-            You would be there around {formatClock(arrival)}. The final time waits for whoever needs
-            longest.
+      {full ? (
+        <Surface variant="secondary" className="gap-1 rounded-3xl p-4">
+          <Typography type="body" weight="semibold">
+            The spots went
           </Typography>
-        </View>
-      </Surface>
+          <Typography type="body-sm" color="muted">
+            Others answered first, so this group is full. Something else nearby will come up.
+          </Typography>
+        </Surface>
+      ) : (
+        <Surface variant="default" className="gap-4 rounded-3xl p-4">
+          <ReadyPicker
+            value={ready}
+            onChange={setReady}
+            hint={`You are ${formatDistance(myKm)} from there — about ${myTravel} min ${travelModeLabel(profile.travelMode)}.`}
+          />
+          <View className="bg-accent-soft rounded-2xl px-3 py-2">
+            <Typography type="body-sm" className="text-accent-soft-foreground">
+              You would be there around {formatClock(arrival)}. The final time waits for whoever
+              needs longest.
+            </Typography>
+          </View>
+        </Surface>
+      )}
 
       <View className="gap-3">
-        <Button onPress={join}>
-          <Button.Label>I want to join!</Button.Label>
-        </Button>
-        <Button variant="ghost" onPress={pass}>
-          <Button.Label>Not this time</Button.Label>
-        </Button>
+        {full ? (
+          <Button onPress={() => goBackOrReplace('/(tabs)/invites')}>
+            <Button.Label>See other invites</Button.Label>
+          </Button>
+        ) : (
+          <>
+            <Button onPress={join}>
+              <Button.Label>I want to join!</Button.Label>
+            </Button>
+            <Button variant="ghost" onPress={pass}>
+              <Button.Label>Not this time</Button.Label>
+            </Button>
+          </>
+        )}
       </View>
     </ScrollView>
   );

@@ -26,13 +26,14 @@ import {
   pingList,
   pingRoute,
   pingSpot,
+  spotsTaken,
 } from '@/lib/pings';
 import { peopleInRadius, useAppStore } from '@/lib/store';
 
 const HOW_IT_WORKS = [
-  'Press the button — we look for places and events inside your radius.',
-  'Pick one. Everyone nearby with the app gets buzzed, not just your friends.',
-  'Whoever wants in says so and picks how long they need to get ready.',
+  'Press the button — five places and events inside your radius, rotate for five more.',
+  'Pick one and set how many can come. Everyone nearby with the app gets buzzed, not just your friends.',
+  'Whoever answers first takes a spot and picks how long they need to get ready.',
   'The app sets the meeting point and a time the slowest person can make.',
 ];
 
@@ -131,7 +132,7 @@ export default function PingHomeScreen() {
               Get me out
             </Typography>
             <Typography type="body-xs" align="center" className="text-accent-foreground px-8">
-              {nearbySpots} spots within {profile.radiusKm} km
+              {nearbySpots} places within {profile.radiusKm} km
             </Typography>
           </View>
         </PressableFeedback>
@@ -146,7 +147,8 @@ export default function PingHomeScreen() {
             </Typography>
           </View>
           <Typography type="body-sm" color="muted">
-            {pingSpot(liveHosted)?.name} · {liveHosted.joins.length} in,{' '}
+            {pingSpot(liveHosted)?.name} · {spotsTaken(liveHosted)} of {liveHosted.spotsForOthers}{' '}
+            {liveHosted.spotsForOthers === 1 ? 'spot' : 'spots'} taken,{' '}
             {liveHosted.notifiedIds.length} phones buzzed
           </Typography>
           <Button onPress={() => router.push(pingRoute(liveHosted))}>

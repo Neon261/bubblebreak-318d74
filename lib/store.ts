@@ -5,6 +5,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { computeMeetAt, distanceKm, travelMinutes } from '@/lib/geo';
 import { buildIntroSentence, INTRO_TEMPLATE_COUNT } from '@/lib/introSentence';
 import { HOME, PEOPLE, SPOTS_BY_ID } from '@/lib/mockData';
+import { clampSpots, spotsLeft, spotsTaken } from '@/lib/pings';
 import {
   type IntroQuestionId,
   ME,
@@ -24,6 +25,7 @@ const DEFAULT_PROFILE: Profile = {
   interests: ['food', 'music', 'outdoors'],
   travelMode: 'bike',
   defaultReadyMinutes: 30,
+  defaultSpots: 3,
   radiusKm: 3,
   openToPings: true,
   notificationsEnabled: false,
@@ -64,14 +66,20 @@ export interface AppState {
   markVerified: (reference: string) => void;
   /** Verification passed and the person is in. */
   completeRegistration: () => void;
-  createPing: (spotId: string, radiusKm: number) => string;
+  createPing: (spotId: string, radiusKm: number, spotsForOthers: number) => string;
   addInboundPing: (ping: Ping) => void;
-  addJoin: (pingId: string, participant: Participant) => void;
+  /** First come, first in: returns false when the spots are already gone. */
+  addJoin: (pingId: string, participant: Participant) => boolean;
   markPassed: (pingId: string, personId: string) => void;
+  /** Wanted in but arrived after the last spot went. */
+  markMissed: (pingId: string, personId: string) => void;
+  /** Host changes how many people can come, never below who is already in. */
+  setSpotCount: (pingId: string, spotsForOthers: number) => void;
   /** Host sends the meeting point and time to everyone who joined. */
   lockPing: (pingId: string) => void;
   cancelPing: (pingId: string) => void;
-  joinInbound: (pingId: string, readyMinutes: ReadyMinutes, travelMode: TravelMode) => void;
+  /** Returns false when the last spot went before I tapped join. */
+  joinInbound: (pingId: string, readyMinutes: ReadyMinutes, travelMode: TravelMode) => boolean;
   passInbound: (pingId: string) => void;
   markSeen: (pingId: string) => void;
   /** Change how long I need to get ready on a ping I already joined. */
@@ -161,7 +169,7 @@ export const useAppStore = create<AppState>()(
       completeRegistration: () =>
         set((state) => ({ profile: { ...state.profile, registeredAt: Date.now() } })),
 
-      createPing: (spotId, radiusKm) => {
+      createPing: (spotId, radiusKm, spotsForOthers) => {
         const id = nextId('ping');
         const { profile } = get();
         const ping: Ping = {
@@ -172,6 +180,8 @@ export const useAppStore = create<AppState>()(
           createdAt: Date.now(),
           notifiedIds: peopleInRadius(radiusKm),
           passedIds: [],
+          missedIds: [],
+          spotsForOthers: clampSpots(spotsForOthers),
           joins: [myParticipant(spotId, profile.defaultReadyMinutes, profile.travelMode)],
           status: 'open',
           myResponse: 'joined',
@@ -190,14 +200,20 @@ export const useAppStore = create<AppState>()(
           pingIds: [ping.id, ...state.pingIds],
         })),
 
-      addJoin: (pingId, participant) =>
+      addJoin: (pingId, participant) => {
+        const ping = get().pings[pingId];
+        if (!ping) return false;
+        if (ping.joins.some((join) => join.personId === participant.personId)) return false;
+        // First come, first in — a late yes finds the spots gone.
+        if (spotsLeft(ping) === 0) return false;
         set((state) => ({
-          pings: patchPings(state.pings, pingId, (ping) =>
-            ping.joins.some((join) => join.personId === participant.personId)
-              ? ping
-              : { ...ping, joins: [...ping.joins, participant] },
-          ),
-        })),
+          pings: patchPings(state.pings, pingId, (current) => ({
+            ...current,
+            joins: [...current.joins, participant],
+          })),
+        }));
+        return true;
+      },
 
       markPassed: (pingId, personId) =>
         set((state) => ({
@@ -206,6 +222,24 @@ export const useAppStore = create<AppState>()(
               ? ping
               : { ...ping, passedIds: [...ping.passedIds, personId] },
           ),
+        })),
+
+      markMissed: (pingId, personId) =>
+        set((state) => ({
+          pings: patchPings(state.pings, pingId, (ping) =>
+            ping.missedIds.includes(personId)
+              ? ping
+              : { ...ping, missedIds: [...ping.missedIds, personId] },
+          ),
+        })),
+
+      setSpotCount: (pingId, spotsForOthers) =>
+        set((state) => ({
+          pings: patchPings(state.pings, pingId, (ping) => {
+            if (ping.status !== 'open') return ping;
+            const next = Math.max(clampSpots(spotsForOthers), spotsTaken(ping));
+            return next === ping.spotsForOthers ? ping : { ...ping, spotsForOthers: next };
+          }),
         })),
 
       lockPing: (pingId) =>
@@ -222,17 +256,23 @@ export const useAppStore = create<AppState>()(
           pings: patchPings(state.pings, pingId, (ping) => ({ ...ping, status: 'cancelled' })),
         })),
 
-      joinInbound: (pingId, readyMinutes, travelMode) =>
+      joinInbound: (pingId, readyMinutes, travelMode) => {
+        const ping = get().pings[pingId];
+        if (!ping) return false;
+        const alreadyIn = ping.joins.some((join) => join.personId === ME);
+        if (!alreadyIn && spotsLeft(ping) === 0) return false;
         set((state) => ({
-          pings: patchPings(state.pings, pingId, (ping) => ({
-            ...ping,
+          pings: patchPings(state.pings, pingId, (current) => ({
+            ...current,
             myResponse: 'joined',
             seen: true,
-            joins: ping.joins.some((join) => join.personId === ME)
-              ? ping.joins
-              : [...ping.joins, myParticipant(ping.spotId, readyMinutes, travelMode)],
+            joins: alreadyIn
+              ? current.joins
+              : [...current.joins, myParticipant(current.spotId, readyMinutes, travelMode)],
           })),
-        })),
+        }));
+        return true;
+      },
 
       passInbound: (pingId) =>
         set((state) => ({

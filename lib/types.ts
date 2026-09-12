@@ -90,6 +90,10 @@ export interface Ping {
   /** People whose phones buzzed. */
   notifiedIds: string[];
   passedIds: string[];
+  /** Wanted in, but the spots were already taken. */
+  missedIds: string[];
+  /** How many people the host lets in besides themselves, 1-5. */
+  spotsForOthers: number;
   joins: Participant[];
   status: PingStatus;
   /** Set once the plan is sent out. */
@@ -127,6 +131,8 @@ export interface Profile {
   interests: Interest[];
   travelMode: TravelMode;
   defaultReadyMinutes: ReadyMinutes;
+  /** How many people I let into a ping I start, 1-5. */
+  defaultSpots: number;
   radiusKm: number;
   openToPings: boolean;
   notificationsEnabled: boolean;

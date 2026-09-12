@@ -4,6 +4,26 @@ import { computeMeetAt, etaMinutes } from '@/lib/geo';
 import { PEOPLE_BY_ID, SPOTS_BY_ID } from '@/lib/mockData';
 import { ME, type Participant, type Ping, type Spot } from '@/lib/types';
 
+/** How many people a host can let in besides themselves. */
+export const SPOT_OPTIONS = [1, 2, 3, 4, 5];
+
+export function clampSpots(count: number): number {
+  return Math.min(5, Math.max(1, Math.round(count)));
+}
+
+/** Everyone in besides the host. */
+export function spotsTaken(ping: Ping): number {
+  return ping.joins.filter((join) => join.personId !== ping.hostId).length;
+}
+
+export function spotsLeft(ping: Ping): number {
+  return Math.max(0, ping.spotsForOthers - spotsTaken(ping));
+}
+
+export function isFull(ping: Ping): boolean {
+  return spotsLeft(ping) === 0;
+}
+
 /** Pings in newest-first order, skipping ids that are no longer around. */
 export function pingList(pings: Record<string, Ping>, ids: string[]): Ping[] {
   return ids.map((id) => pings[id]).filter((ping): ping is Ping => Boolean(ping));

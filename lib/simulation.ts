@@ -1,6 +1,7 @@
 import { distanceKm, travelMinutes } from '@/lib/geo';
 import { HOME, PEOPLE, PEOPLE_BY_ID, SPOTS, SPOTS_BY_ID } from '@/lib/mockData';
 import { pushLocalNotification } from '@/lib/notifications';
+import { clampSpots, isFull } from '@/lib/pings';
 import { useAppStore } from '@/lib/store';
 import {
   ME,
@@ -79,7 +80,6 @@ export function startPingSimulation(pingId: string) {
     .sort((a, b) => distanceKm(HOME, a.location) - distanceKm(HOME, b.location));
 
   let delay = randomBetween(1800, 3200);
-  let joined = 0;
 
   candidates.forEach((person) => {
     delay += randomBetween(2200, 6500);
@@ -90,13 +90,32 @@ export function startPingSimulation(pingId: string) {
       const current = useAppStore.getState().pings[pingId];
       if (!current || current.status !== 'open') return;
 
-      if (!willJoin || joined >= 5) {
+      if (!willJoin) {
         useAppStore.getState().markPassed(pingId, person.id);
         return;
       }
-      joined += 1;
-      useAppStore.getState().addJoin(pingId, personParticipant(person, spot));
+
+      // Wanted in, but somebody else took the last spot first.
+      if (isFull(current)) {
+        useAppStore.getState().markMissed(pingId, person.id);
+        return;
+      }
+
+      const joined = useAppStore.getState().addJoin(pingId, personParticipant(person, spot));
+      if (!joined) {
+        useAppStore.getState().markMissed(pingId, person.id);
+        return;
+      }
+
       void pushLocalNotification(`${person.name} wants to join!`, `${spot.name} — ${person.bio}`);
+
+      const after = useAppStore.getState().pings[pingId];
+      if (after && isFull(after)) {
+        void pushLocalNotification(
+          'That is everyone',
+          `All ${after.spotsForOthers} spots at ${spot.name} are taken. Send the plan when you are ready.`,
+        );
+      }
     });
   });
 }
@@ -121,6 +140,10 @@ export function scheduleHostPlan(pingId: string) {
 }
 
 function buildInboundPing(host: Person, spot: Spot, extras: Person[]): Ping {
+  const joins = [
+    personParticipant(host, spot),
+    ...extras.map((person) => personParticipant(person, spot)),
+  ];
   return {
     id: `inbound-${host.id}-${spot.id}`,
     hostId: host.id,
@@ -129,10 +152,10 @@ function buildInboundPing(host: Person, spot: Spot, extras: Person[]): Ping {
     createdAt: Date.now() - Math.round(randomBetween(1, 4)) * 60_000,
     notifiedIds: [ME, ...extras.map((person) => person.id)],
     passedIds: [],
-    joins: [
-      personParticipant(host, spot),
-      ...extras.map((person) => personParticipant(person, spot)),
-    ],
+    missedIds: [],
+    // Their limit leaves at least one spot open when the invite lands.
+    spotsForOthers: clampSpots(extras.length + pick([1, 1, 2, 3])),
+    joins,
     status: 'open',
     myResponse: 'none',
     seen: false,

@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import { PersonAvatar } from '@/components/PersonAvatar';
 import { formatClock, formatRelative } from '@/lib/geo';
 import { PEOPLE_BY_ID } from '@/lib/mockData';
-import { hostName, isHostedByMe, pingSpot } from '@/lib/pings';
+import { hostName, isHostedByMe, pingSpot, spotsLeft } from '@/lib/pings';
 import { CATEGORY_VISUALS } from '@/lib/spotVisuals';
 import type { Ping } from '@/lib/types';
 
@@ -24,7 +24,9 @@ function statusLine(ping: Ping): string {
   if (ping.myResponse === 'joined') {
     return `Waiting for the time · ${ping.joins.length} in`;
   }
-  return `${ping.joins.length} in so far · ${formatRelative(ping.createdAt)}`;
+  const left = spotsLeft(ping);
+  if (left === 0) return `Spots gone · ${formatRelative(ping.createdAt)}`;
+  return `${left} ${left === 1 ? 'spot' : 'spots'} left · ${formatRelative(ping.createdAt)}`;
 }
 
 export function PingSummaryCard({ ping, myName, onPress }: PingSummaryCardProps) {

@@ -5,6 +5,7 @@ import { Radio, Users } from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
 
 import { EmptyState } from '@/components/EmptyState';
+import { GroupSizePicker } from '@/components/GroupSizePicker';
 import { JoinerRow } from '@/components/JoinerRow';
 import { PingMap } from '@/components/PingMap';
 import { SpotCard } from '@/components/SpotCard';
@@ -13,10 +14,9 @@ import { useTicker } from '@/hooks/useTicker';
 import { computeMeetAt, distanceKm, formatClock, travelMinutes } from '@/lib/geo';
 import { HOME } from '@/lib/mockData';
 import { goBackOrReplace } from '@/lib/navigation';
-import { myJoin, participantName, pingSpot, slowestJoin } from '@/lib/pings';
+import { myJoin, participantName, pingSpot, slowestJoin, spotsLeft, spotsTaken } from '@/lib/pings';
 import { pushLocalNotification } from '@/lib/notifications';
 import { useAppStore } from '@/lib/store';
-import { ME } from '@/lib/types';
 
 export default function LivePingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -30,13 +30,10 @@ export default function LivePingScreen() {
   const lockPing = useAppStore((state) => state.lockPing);
   const cancelPing = useAppStore((state) => state.cancelPing);
   const setMyReady = useAppStore((state) => state.setMyReady);
+  const setSpotCount = useAppStore((state) => state.setSpotCount);
 
   const spot = ping ? pingSpot(ping) : undefined;
   const mine = ping ? myJoin(ping) : undefined;
-  const others = useMemo(
-    () => ping?.joins.filter((join) => join.personId !== ME) ?? [],
-    [ping?.joins],
-  );
   const slowest = ping ? slowestJoin(ping) : undefined;
   const previewTime = useMemo(() => (ping ? computeMeetAt(ping.joins, now) : now), [now, ping]);
 
@@ -70,6 +67,9 @@ export default function LivePingScreen() {
   };
 
   const myTravel = travelMinutes(distanceKm(HOME, spot.location), profile.travelMode);
+  const taken = spotsTaken(ping);
+  const left = spotsLeft(ping);
+  const full = left === 0;
 
   return (
     <ScrollView
@@ -79,18 +79,26 @@ export default function LivePingScreen() {
     >
       <Surface variant="secondary" className="gap-2 rounded-3xl p-4">
         <View className="flex-row items-center gap-2">
-          <Spinner />
+          {full ? <Users color={accent} size={16} /> : <Spinner />}
           <Typography type="body-sm" weight="semibold">
-            Buzzing {ping.notifiedIds.length} phones within {ping.radiusKm} km
+            {full
+              ? `Full — ${taken} ${taken === 1 ? 'person is' : 'people are'} in`
+              : `Buzzing ${ping.notifiedIds.length} phones within ${ping.radiusKm} km`}
           </Typography>
         </View>
         <Typography type="body-sm" color="muted">
-          {others.length === 0
-            ? 'Nobody has answered yet. Answers usually trickle in over a couple of minutes.'
-            : `${others.length} ${others.length === 1 ? 'person wants' : 'people want'} in${
-                ping.passedIds.length > 0 ? ` · ${ping.passedIds.length} passed` : ''
-              }`}
+          {full
+            ? 'The spots went to whoever answered first. Send the plan whenever you like.'
+            : `${left} of ${ping.spotsForOthers} ${ping.spotsForOthers === 1 ? 'spot' : 'spots'} still open · ${
+                taken === 0 ? 'nobody has answered yet' : `${taken} in`
+              }${ping.passedIds.length > 0 ? ` · ${ping.passedIds.length} passed` : ''}`}
         </Typography>
+        {ping.missedIds.length > 0 ? (
+          <Typography type="body-xs" color="muted">
+            {ping.missedIds.length} {ping.missedIds.length === 1 ? 'person' : 'people'} wanted in
+            after the last spot went.
+          </Typography>
+        ) : null}
       </Surface>
 
       <SpotCard
@@ -102,7 +110,17 @@ export default function LivePingScreen() {
 
       <PingMap home={HOME} spot={spot} radiusKm={ping.radiusKm} joins={ping.joins} height={200} />
 
-      <Surface variant="default" className="gap-3 rounded-3xl p-4">
+      <Surface variant="default" className="gap-4 rounded-3xl p-4">
+        <GroupSizePicker
+          value={ping.spotsForOthers}
+          onChange={(count) => setSpotCount(ping.id, count)}
+          min={Math.max(1, taken)}
+          hint={
+            taken > 0
+              ? `${taken} already in, so the limit can only go up from here. Group of ${ping.spotsForOthers + 1} at most.`
+              : `A group of ${ping.spotsForOthers + 1} at most, you included. First to say yes is in.`
+          }
+        />
         <ReadyPicker
           value={mine?.readyMinutes ?? profile.defaultReadyMinutes}
           onChange={(minutes) => setMyReady(ping.id, minutes)}
@@ -115,7 +133,7 @@ export default function LivePingScreen() {
         <View className="flex-row items-center gap-2 pb-1">
           <Users color={accent} size={16} />
           <Typography type="body-sm" weight="semibold">
-            Who is in
+            Who is in · {ping.joins.length} of {ping.spotsForOthers + 1}
           </Typography>
         </View>
         {ping.joins.map((join) => (
@@ -144,9 +162,13 @@ export default function LivePingScreen() {
       </Surface>
 
       <View className="gap-3">
-        <Button onPress={sendPlan} isDisabled={others.length === 0}>
+        <Button onPress={sendPlan} isDisabled={taken === 0}>
           <Button.Label>
-            {others.length === 0 ? 'Waiting for the first yes' : 'Send the plan to everyone'}
+            {taken === 0
+              ? 'Waiting for the first yes'
+              : full
+                ? 'Send the plan — the group is full'
+                : 'Send the plan to everyone'}
           </Button.Label>
         </Button>
         <Button variant="danger-soft" onPress={() => cancelPing(ping.id)}>
