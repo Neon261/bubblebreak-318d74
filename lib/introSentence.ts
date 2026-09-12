@@ -15,12 +15,22 @@ export interface IntroQuestion {
   options: IntroOption[];
 }
 
+/** The "none of these fit" route: type an answer instead of picking one. */
+export interface IntroCustomPrompt {
+  /** Sentence lead-in shown above the field, e.g. "Fun fact: I…". */
+  lead: string;
+  placeholder: string;
+  /** Turns typed words into a fragment that fits this group's slot. */
+  toFragment: (text: string) => string;
+}
+
 export interface IntroCategory {
   id: IntroCategoryId;
   /** Shown above the question so the topic is clear. */
   label: string;
   /** What this group is trying to learn about you. */
   about: string;
+  custom: IntroCustomPrompt;
   /**
    * Every question here produces the same kind of fragment, so switching a
    * question never breaks the sentence.
@@ -44,6 +54,11 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
     id: 'doing',
     label: 'What you are up for',
     about: 'The kind of plan you say yes to.',
+    custom: {
+      lead: "I'd leave the house for…",
+      placeholder: 'a rooftop and cheap wine',
+      toFragment: (text) => text,
+    },
     questions: [
       {
         id: 'fastest',
@@ -147,6 +162,11 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
     id: 'personality',
     label: 'How you are with people',
     about: 'The part strangers notice first.',
+    custom: {
+      lead: 'Around new people, I tend to…',
+      placeholder: 'ask three questions too many',
+      toFragment: (text) => `tends to ${text}`,
+    },
     questions: [
       {
         id: 'strangers',
@@ -262,6 +282,11 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
     id: 'funfact',
     label: 'One fun fact',
     about: 'The bit people repeat about you later.',
+    custom: {
+      lead: 'Fun fact: I…',
+      placeholder: 'have never finished a crossword',
+      toFragment: (text) => `swears they ${text}`,
+    },
     questions: [
       {
         id: 'useless-talent',
@@ -377,6 +402,11 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
     id: 'hobby',
     label: 'Your hobby',
     about: 'Where your spare hours actually go.',
+    custom: {
+      lead: 'My spare time goes on…',
+      placeholder: 'rebuilding the same playlist',
+      toFragment: (text) => text,
+    },
     questions: [
       {
         id: 'spare-time',
@@ -492,6 +522,11 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
     id: 'signature',
     label: 'Your signature move',
     about: 'How your nights out tend to go.',
+    custom: {
+      lead: 'A good night out and I…',
+      placeholder: 'close down the dance floor',
+      toFragment: (text) => `will ${text}`,
+    },
     questions: [
       {
         id: 'ending',
@@ -618,7 +653,7 @@ const TEMPLATES: ((parts: Record<IntroCategoryId, string>, name: string) => stri
   (parts, name) =>
     `${name}, who ${parts.personality} and ${parts.funfact}, shows up for ${parts.doing}, disappears into ${parts.hobby}, and ${parts.signature}.`,
   (parts, name) =>
-    `${name} runs on ${parts.doing}, spends far too long ${parts.hobby}, ${parts.personality}, and ${parts.signature} — fun fact, ${parts.funfact}.`,
+    `${name} runs on ${parts.doing}, spends far too long on ${parts.hobby}, ${parts.personality}, and ${parts.signature} — fun fact, ${parts.funfact}.`,
   (parts, name) =>
     `Somewhere between ${parts.hobby} and ${parts.doing}: ${name} ${parts.personality}, ${parts.signature}, and ${parts.funfact}.`,
   (parts, name) =>
@@ -652,6 +687,136 @@ export function currentIntroQuestion(
 function randomItem<T>(items: T[]): T | undefined {
   if (items.length === 0) return undefined;
   return items[Math.floor(Math.random() * items.length)];
+}
+
+export const CUSTOM_ANSWER_MIN_LENGTH = 4;
+export const CUSTOM_ANSWER_MAX_LENGTH = 90;
+
+/**
+ * Words that are safe to lower-case when they open a typed answer, so
+ * "Ask too many questions" reads properly mid-sentence. Anything else keeps
+ * its capital, because it is probably a name or a place.
+ */
+const LOWERCASE_STARTERS = new Set([
+  'a',
+  'always',
+  'an',
+  'anything',
+  'ask',
+  'asking',
+  'bake',
+  'baking',
+  'bring',
+  'build',
+  'building',
+  'can',
+  'cannot',
+  'close',
+  'collect',
+  'collecting',
+  'cook',
+  'cooking',
+  'dance',
+  'dancing',
+  'draw',
+  'drawing',
+  'end',
+  'find',
+  'fix',
+  'fixing',
+  'get',
+  'getting',
+  'go',
+  'going',
+  'have',
+  'keep',
+  'keeping',
+  'know',
+  'learn',
+  'learning',
+  'like',
+  'listen',
+  'love',
+  'make',
+  'making',
+  'my',
+  'need',
+  'never',
+  'once',
+  'one',
+  'own',
+  'play',
+  'playing',
+  'read',
+  'reading',
+  'remember',
+  'run',
+  'running',
+  'say',
+  'sing',
+  'singing',
+  'sit',
+  'spend',
+  'spending',
+  'stay',
+  'still',
+  'take',
+  'talk',
+  'talking',
+  'tell',
+  'the',
+  'turn',
+  'two',
+  'walk',
+  'walking',
+  'watch',
+  'watching',
+  'will',
+  'write',
+  'writing',
+]);
+
+/** Tidies a typed answer so it can be dropped into the sentence templates. */
+export function cleanCustomText(text: string): string {
+  const collapsed = text
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/[.,;:!]+$/, '')
+    // The lead-in already says "I", so a repeated one would read twice.
+    .replace(/^i['’]?m? /i, '')
+    .replace(/^to /i, '')
+    .trim();
+
+  const space = collapsed.indexOf(' ');
+  const head = space === -1 ? collapsed : collapsed.slice(0, space);
+  const lower = head.toLowerCase();
+  if (!LOWERCASE_STARTERS.has(lower)) return collapsed;
+  return lower + collapsed.slice(head.length);
+}
+
+/** The typed answer, shaped for this group's slot in the sentence. */
+export function customIntroFragment(categoryId: IntroCategoryId, text: string): string {
+  const cleaned = cleanCustomText(text);
+  if (!cleaned) return '';
+  const category = introCategory(categoryId);
+  return category ? category.custom.toFragment(cleaned) : cleaned;
+}
+
+/** True once a group has either a tapped option or a typed answer. */
+export function hasIntroAnswer(pick: IntroPick | undefined): boolean {
+  if (!pick) return false;
+  return Boolean(pick.optionId) || cleanCustomText(pick.customText ?? '').length > 0;
+}
+
+/** The fragment behind a group's answer, typed or tapped. */
+function introFragment(categoryId: IntroCategoryId, pick: IntroPick | undefined): string {
+  if (!pick) return '';
+  if (pick.customText) return customIntroFragment(categoryId, pick.customText);
+  return (
+    introQuestion(categoryId, pick.questionId)?.options.find(
+      (option) => option.id === pick.optionId,
+    )?.fragment ?? ''
+  );
 }
 
 /** A random question from this group only — never from another group. */
@@ -699,12 +864,12 @@ export function switchedIntroPick(
 
 /** Index of the first group without an answer, or the count when all are done. */
 export function firstUnansweredIndex(answers: IntroAnswers): number {
-  const index = INTRO_CATEGORIES.findIndex((category) => !answers[category.id]?.optionId);
+  const index = INTRO_CATEGORIES.findIndex((category) => !hasIntroAnswer(answers[category.id]));
   return index === -1 ? INTRO_CATEGORIES.length : index;
 }
 
 export function hasAllIntroAnswers(answers: IntroAnswers): boolean {
-  return INTRO_CATEGORY_IDS.every((id) => Boolean(answers[id]?.optionId));
+  return INTRO_CATEGORY_IDS.every((id) => hasIntroAnswer(answers[id]));
 }
 
 function hasEveryFragment(
@@ -727,10 +892,7 @@ export function buildIntroSentence(
 
   const parts: Partial<Record<IntroCategoryId, string>> = {};
   for (const id of INTRO_CATEGORY_IDS) {
-    const pick = answers[id];
-    const fragment = introQuestion(id, pick?.questionId)?.options.find(
-      (option) => option.id === pick?.optionId,
-    )?.fragment;
+    const fragment = introFragment(id, answers[id]);
     if (!fragment) return '';
     parts[id] = fragment;
   }

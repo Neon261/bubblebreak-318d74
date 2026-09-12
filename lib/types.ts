@@ -110,6 +110,8 @@ export type IntroCategoryId = 'doing' | 'personality' | 'funfact' | 'hobby' | 's
 export interface IntroPick {
   questionId: string;
   optionId?: string;
+  /** Set when none of the options fit and the answer was typed by hand. */
+  customText?: string;
 }
 
 /** Category id -> the question drawn for it plus the answer. */

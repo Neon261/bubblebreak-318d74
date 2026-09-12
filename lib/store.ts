@@ -74,6 +74,8 @@ export interface AppState {
   setFirstName: (firstName: string) => void;
   /** Registration step 2: answers the question currently shown for a group. */
   setIntroAnswer: (categoryId: IntroCategoryId, optionId: string) => void;
+  /** Their own wording when none of the options fits; empty text clears it. */
+  setIntroCustomAnswer: (categoryId: IntroCategoryId, text: string) => void;
   /** Draws another question from the same group and clears that answer. */
   switchIntroQuestion: (categoryId: IntroCategoryId) => void;
   /** Re-word the same answers. */
@@ -163,6 +165,22 @@ export const useAppStore = create<AppState>()(
               introAnswers: {
                 ...state.profile.introAnswers,
                 [categoryId]: { questionId: question.id, optionId },
+              },
+            }),
+          };
+        }),
+
+      setIntroCustomAnswer: (categoryId, text) =>
+        set((state) => {
+          const question = currentIntroQuestion(categoryId, state.profile.introAnswers);
+          if (!question) return {};
+          return {
+            profile: withIntro({
+              ...state.profile,
+              introAnswers: {
+                ...state.profile.introAnswers,
+                // Kept exactly as typed; the sentence tidies it up on the way in.
+                [categoryId]: { questionId: question.id, customText: text || undefined },
               },
             }),
           };
