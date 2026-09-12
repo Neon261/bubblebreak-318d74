@@ -19,7 +19,7 @@ interface Row {
 
 export default function InvitesScreen() {
   const router = useRouter();
-  const myName = useAppStore((state) => state.profile.name);
+  const myName = useAppStore((state) => state.profile.firstName);
   const openToPings = useAppStore((state) => state.profile.openToPings);
   const pings = useAppStore((state) => state.pings);
   const pingIds = useAppStore((state) => state.pingIds);

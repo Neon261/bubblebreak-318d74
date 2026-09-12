@@ -3,8 +3,10 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { computeMeetAt, distanceKm, travelMinutes } from '@/lib/geo';
+import { buildIntroSentence, INTRO_TEMPLATE_COUNT } from '@/lib/introSentence';
 import { HOME, PEOPLE, SPOTS_BY_ID } from '@/lib/mockData';
 import {
+  type IntroQuestionId,
   ME,
   type Participant,
   type Ping,
@@ -12,18 +14,33 @@ import {
   type ReadyMinutes,
   type TravelMode,
 } from '@/lib/types';
+import { VERIFY_PROVIDER } from '@/lib/verification';
 
 const DEFAULT_PROFILE: Profile = {
-  name: 'You',
-  age: 32,
-  bio: 'Curious, mildly overbooked, up for the unfamiliar',
+  firstName: '',
+  intro: '',
+  introAnswers: {},
+  introVariant: 0,
   interests: ['food', 'music', 'outdoors'],
   travelMode: 'bike',
   defaultReadyMinutes: 30,
   radiusKm: 3,
   openToPings: true,
   notificationsEnabled: false,
+  verification: { status: 'unverified' },
 };
+
+/** Keeps the shown sentence in step with the name and the answers behind it. */
+function withIntro(profile: Profile): Profile {
+  return {
+    ...profile,
+    intro: buildIntroSentence(profile.firstName, profile.introAnswers, profile.introVariant),
+  };
+}
+
+function hasPersistedProfile(value: unknown): value is { profile: Partial<Profile> } {
+  return typeof value === 'object' && value !== null && 'profile' in value;
+}
 
 let idCounter = 0;
 function nextId(prefix: string): string {
@@ -37,6 +54,16 @@ export interface AppState {
   /** Newest first. */
   pingIds: string[];
   updateProfile: (patch: Partial<Profile>) => void;
+  /** Registration step 1. */
+  setFirstName: (firstName: string) => void;
+  /** Registration step 2: one of the five questions gets answered. */
+  setIntroAnswer: (questionId: IntroQuestionId, optionId: string) => void;
+  /** Re-word the same answers. */
+  shuffleIntro: () => void;
+  /** Registration step 3: the outside provider came back with a pass. */
+  markVerified: (reference: string) => void;
+  /** Verification passed and the person is in. */
+  completeRegistration: () => void;
   createPing: (spotId: string, radiusKm: number) => string;
   addInboundPing: (ping: Ping) => void;
   addJoin: (pingId: string, participant: Participant) => void;
@@ -98,6 +125,41 @@ export const useAppStore = create<AppState>()(
       pingIds: [],
 
       updateProfile: (patch) => set((state) => ({ profile: { ...state.profile, ...patch } })),
+
+      setFirstName: (firstName) =>
+        set((state) => ({ profile: withIntro({ ...state.profile, firstName: firstName.trim() }) })),
+
+      setIntroAnswer: (questionId, optionId) =>
+        set((state) => ({
+          profile: withIntro({
+            ...state.profile,
+            introAnswers: { ...state.profile.introAnswers, [questionId]: optionId },
+          }),
+        })),
+
+      shuffleIntro: () =>
+        set((state) => ({
+          profile: withIntro({
+            ...state.profile,
+            introVariant: (state.profile.introVariant + 1) % INTRO_TEMPLATE_COUNT,
+          }),
+        })),
+
+      markVerified: (reference) =>
+        set((state) => ({
+          profile: {
+            ...state.profile,
+            verification: {
+              status: 'verified',
+              provider: VERIFY_PROVIDER,
+              reference,
+              verifiedAt: Date.now(),
+            },
+          },
+        })),
+
+      completeRegistration: () =>
+        set((state) => ({ profile: { ...state.profile, registeredAt: Date.now() } })),
 
       createPing: (spotId, radiusKm) => {
         const id = nextId('ping');
@@ -211,9 +273,17 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'bubble-store',
+      version: 2,
       storage: createJSONStorage(() => AsyncStorage),
       // Live pings are session state; only the profile is worth keeping.
       partialize: (state) => ({ profile: state.profile }),
+      // Profiles saved before registration existed have no name, sentence or
+      // verification, so they start the flow from the top.
+      migrate: () => ({ profile: DEFAULT_PROFILE }),
+      merge: (persisted, current) => {
+        const saved = hasPersistedProfile(persisted) ? persisted.profile : undefined;
+        return { ...current, profile: { ...DEFAULT_PROFILE, ...saved } };
+      },
     },
   ),
 );

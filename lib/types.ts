@@ -54,7 +54,7 @@ export interface Spot {
 export interface Person {
   id: string;
   name: string;
-  age: number;
+  /** Their own generated one-liner. */
   bio: string;
   colorClass: string;
   interests: Interest[];
@@ -99,14 +99,38 @@ export interface Ping {
   seen: boolean;
 }
 
+/** The five things the app asks during registration. */
+export type IntroQuestionId = 'pull' | 'talent' | 'strangers' | 'object' | 'ending';
+
+/** Question id -> chosen option id. */
+export type IntroAnswers = Partial<Record<IntroQuestionId, string>>;
+
+export type VerificationStatus = 'unverified' | 'verified';
+
+/** What comes back from the outside identity provider — never a photo. */
+export interface VerificationInfo {
+  status: VerificationStatus;
+  provider?: string;
+  /** Provider-side reference code for the passed check. */
+  reference?: string;
+  verifiedAt?: number;
+}
+
 export interface Profile {
-  name: string;
-  age: number;
-  bio: string;
+  /** First name only. No photo, no age anywhere in the app. */
+  firstName: string;
+  /** The one funny line generated from the registration answers. */
+  intro: string;
+  introAnswers: IntroAnswers;
+  /** Which sentence wording is in use; shuffling moves this on. */
+  introVariant: number;
   interests: Interest[];
   travelMode: TravelMode;
   defaultReadyMinutes: ReadyMinutes;
   radiusKm: number;
   openToPings: boolean;
   notificationsEnabled: boolean;
+  verification: VerificationInfo;
+  /** Set once name, sentence and verification are all done. */
+  registeredAt?: number;
 }

@@ -14,7 +14,7 @@ import type { Ping } from '@/lib/types';
 export default function PlansScreen() {
   const router = useRouter();
   const now = useTicker(30_000);
-  const myName = useAppStore((state) => state.profile.name);
+  const myName = useAppStore((state) => state.profile.firstName);
   const pings = useAppStore((state) => state.pings);
   const pingIds = useAppStore((state) => state.pingIds);
 

@@ -310,7 +310,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-yara',
     name: 'Yara',
-    age: 29,
     bio: 'Night-shift nurse, learning bass badly',
     colorClass: 'bg-berry',
     interests: ['music', 'food'],
@@ -321,7 +320,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-tomas',
     name: 'Tomás',
-    age: 34,
     bio: 'Bakes too much bread, gives it away',
     colorClass: 'bg-sun',
     interests: ['food', 'talks'],
@@ -332,7 +330,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-aicha',
     name: 'Aïcha',
-    age: 26,
     bio: 'Roofer by day, quiz menace by night',
     colorClass: 'bg-grape',
     interests: ['games', 'sports'],
@@ -343,7 +340,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-bo',
     name: 'Bo',
-    age: 41,
     bio: 'Runs slow on purpose, talks fast',
     colorClass: 'bg-moss',
     interests: ['sports', 'outdoors'],
@@ -354,7 +350,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-ingrid',
     name: 'Ingrid',
-    age: 58,
     bio: 'Retired electrician, fixes anything',
     colorClass: 'bg-clay',
     interests: ['talks', 'art'],
@@ -365,7 +360,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-malik',
     name: 'Malik',
-    age: 31,
     bio: 'Drives a tram, collects vinyl',
     colorClass: 'bg-sky',
     interests: ['music', 'talks'],
@@ -376,7 +370,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-sena',
     name: 'Sena',
-    age: 24,
     bio: 'Studies bees, dances salsa worse',
     colorClass: 'bg-berry',
     interests: ['dance', 'outdoors'],
@@ -387,7 +380,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-paulo',
     name: 'Paulo',
-    age: 37,
     bio: 'Chef on his day off, will still cook',
     colorClass: 'bg-sun',
     interests: ['food', 'games'],
@@ -398,7 +390,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-nour',
     name: 'Nour',
-    age: 28,
     bio: 'Translator, four languages, one bike',
     colorClass: 'bg-grape',
     interests: ['talks', 'art'],
@@ -409,7 +400,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-kai',
     name: 'Kai',
-    age: 22,
     bio: 'Apprentice carpenter, terrible at chess',
     colorClass: 'bg-moss',
     interests: ['games', 'sports'],
@@ -420,7 +410,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-reva',
     name: 'Reva',
-    age: 45,
     bio: 'Midwife, sings in a choir of strangers',
     colorClass: 'bg-sky',
     interests: ['music', 'talks'],
@@ -431,7 +420,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-fabi',
     name: 'Fabi',
-    age: 33,
     bio: 'Bike courier, knows every shortcut',
     colorClass: 'bg-clay',
     interests: ['sports', 'outdoors', 'food'],
@@ -442,7 +430,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-hana',
     name: 'Hana',
-    age: 30,
     bio: 'Sound engineer, hears everything',
     colorClass: 'bg-berry',
     interests: ['music', 'art'],
@@ -453,7 +440,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-dmitri',
     name: 'Dmitri',
-    age: 52,
     bio: 'Taxi driver, tells the good version',
     colorClass: 'bg-sun',
     interests: ['talks', 'games'],
@@ -464,7 +450,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-lea',
     name: 'Lea',
-    age: 27,
     bio: 'Vet nurse, climbs on Tuesdays',
     colorClass: 'bg-grape',
     interests: ['sports', 'food'],
@@ -475,7 +460,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-jonas',
     name: 'Jonas',
-    age: 39,
     bio: 'Postman, draws the routes he walks',
     colorClass: 'bg-moss',
     interests: ['art', 'outdoors'],
@@ -486,7 +470,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-mira',
     name: 'Mira',
-    age: 35,
     bio: 'Gardener, brings snacks to everything',
     colorClass: 'bg-sky',
     interests: ['outdoors', 'food', 'dance'],
@@ -497,7 +480,6 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-otto',
     name: 'Otto',
-    age: 63,
     bio: 'Plays accordion at bus stops',
     colorClass: 'bg-clay',
     interests: ['music', 'talks'],

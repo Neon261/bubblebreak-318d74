@@ -1,26 +1,37 @@
+import { useState } from 'react';
+import { useRouter } from 'expo-router';
 import {
+  Button,
   Chip,
   Input,
   Label,
   Surface,
   Switch,
-  TextArea,
   TextField,
   Typography,
+  useThemeColor,
 } from 'heroui-native';
+import { RefreshCw, Sparkles } from 'lucide-react-native';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 
 import { PersonAvatar } from '@/components/PersonAvatar';
 import { RadiusSlider } from '@/components/RadiusSlider';
 import { ReadyPicker } from '@/components/ReadyPicker';
+import { VerifiedBadge } from '@/components/VerifiedBadge';
 import { TRAVEL_MODES, travelModeLabel } from '@/lib/geo';
 import { ALL_INTERESTS, HOME, INTEREST_LABELS } from '@/lib/mockData';
 import { peopleInRadius, useAppStore } from '@/lib/store';
 import type { Interest } from '@/lib/types';
 
 export default function ProfileScreen() {
+  const router = useRouter();
+  const [accent] = useThemeColor(['accent']);
   const profile = useAppStore((state) => state.profile);
   const updateProfile = useAppStore((state) => state.updateProfile);
+  const setFirstName = useAppStore((state) => state.setFirstName);
+  const shuffleIntro = useAppStore((state) => state.shuffleIntro);
+
+  const [nameDraft, setNameDraft] = useState(profile.firstName);
 
   const toggleInterest = (interest: Interest) => {
     const has = profile.interests.includes(interest);
@@ -42,33 +53,69 @@ export default function ProfileScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-row items-center gap-4">
-          <PersonAvatar name={profile.name} colorClass="bg-accent-soft" size="lg" />
+          <PersonAvatar name={profile.firstName} colorClass="bg-accent-soft" size="lg" />
           <View className="flex-1 gap-1">
-            <Typography type="h3">{profile.name}</Typography>
+            <Typography type="h3">{profile.firstName}</Typography>
             <Typography type="body-sm" color="muted">
               {HOME.label}
             </Typography>
+            <View className="flex-row">
+              <VerifiedBadge label={`Verified by ${profile.verification.provider}`} />
+            </View>
           </View>
         </View>
 
+        <Surface variant="secondary" className="gap-3 rounded-3xl p-4">
+          <View className="flex-row items-center gap-2">
+            <Sparkles color={accent} size={16} />
+            <Typography type="body-xs" color="muted" className="tracking-widest uppercase">
+              What people read about you
+            </Typography>
+          </View>
+          <Typography type="body">{profile.intro}</Typography>
+          <View className="gap-2">
+            <Button variant="tertiary" onPress={shuffleIntro}>
+              <Button.Label>
+                <View className="flex-row items-center gap-2">
+                  <RefreshCw color={accent} size={16} />
+                  <Typography type="body-sm" weight="medium">
+                    Try another wording
+                  </Typography>
+                </View>
+              </Button.Label>
+            </Button>
+            <Button variant="ghost" onPress={() => router.push('/intro')}>
+              <Button.Label>Answer the questions again</Button.Label>
+            </Button>
+          </View>
+        </Surface>
+
         <Surface variant="default" className="gap-4 rounded-3xl p-4">
           <TextField>
-            <Label>Your name</Label>
+            <Label>First name</Label>
             <Input
-              value={profile.name}
-              onChangeText={(text) => updateProfile({ name: text })}
+              value={nameDraft}
+              onChangeText={setNameDraft}
+              onBlur={() => setFirstName(nameDraft.trim() || profile.firstName)}
               placeholder="What people see when you ping"
+              autoCapitalize="words"
+              maxLength={24}
             />
           </TextField>
+        </Surface>
 
-          <TextField>
-            <Label>One line about you</Label>
-            <TextArea
-              value={profile.bio}
-              onChangeText={(text) => updateProfile({ bio: text })}
-              placeholder="Something a stranger could start a conversation with"
-            />
-          </TextField>
+        <Surface variant="default" className="gap-2 rounded-3xl p-4">
+          <View className="flex-row items-center gap-2">
+            <VerifiedBadge />
+            <Typography type="body-sm" weight="medium">
+              Identity check passed
+            </Typography>
+          </View>
+          <Typography type="body-xs" color="muted">
+            {profile.verification.provider} confirmed you are a real person. Reference{' '}
+            {profile.verification.reference}. Everyone you meet here passed the same check — no
+            photos, no ages, just verified people.
+          </Typography>
         </Surface>
 
         <Surface variant="default" className="gap-3 rounded-3xl p-4">

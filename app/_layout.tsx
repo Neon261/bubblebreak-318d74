@@ -27,6 +27,8 @@ import { registerServiceWorker } from '@/lib/registerServiceWorker';
 import { reportErrorToParent } from '@/lib/reportPreviewError';
 import { InstallPrompt } from '@/components/InstallPrompt';
 import { useSession } from '@/hooks/useSession';
+import { useStoreHydrated } from '@/hooks/useStoreHydrated';
+import { useAppStore } from '@/lib/store';
 
 /**
  * Custom ErrorBoundary that reports React render errors to the parent window (Bilt preview iframe)
@@ -47,6 +49,10 @@ export { ErrorBoundary };
 // Starter is light-only by default. Remove this when implementing requested dark mode.
 Uniwind.setTheme('light');
 
+// Registered people land on the tabs; the registration flow is the only other
+// unguarded route, so it is where everyone else is sent.
+export const unstable_settings = { anchor: '(tabs)' };
+
 void SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -56,6 +62,7 @@ export default function RootLayout() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
+  const hydrated = useStoreHydrated();
 
   // Report uncaught JS errors and unhandled promise rejections to parent (Bilt preview iframe)
   useEffect(() => {
@@ -130,12 +137,12 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (loaded || error) {
+    if ((loaded || error) && hydrated) {
       void SplashScreen.hideAsync();
     }
-  }, [loaded, error]);
+  }, [loaded, error, hydrated]);
 
-  if (!loaded && !error) {
+  if ((!loaded && !error) || !hydrated) {
     return null;
   }
 
@@ -151,6 +158,7 @@ export default function RootLayout() {
 
 function AppStack() {
   const [background, foreground] = useThemeColor(['background', 'foreground']);
+  const registered = useAppStore((state) => state.profile.registeredAt !== undefined);
   useSession();
 
   return (
@@ -164,11 +172,19 @@ function AppStack() {
         contentStyle: { backgroundColor: background },
       }}
     >
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="discover" options={{ title: 'Around you' }} />
-      <Stack.Screen name="ping/[id]" options={{ title: 'Your ping' }} />
-      <Stack.Screen name="invite/[id]" options={{ title: 'Invitation' }} />
-      <Stack.Screen name="plan/[id]" options={{ title: 'The plan' }} />
+      <Stack.Protected guard={registered}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="discover" options={{ title: 'Around you' }} />
+        <Stack.Screen name="ping/[id]" options={{ title: 'Your ping' }} />
+        <Stack.Screen name="invite/[id]" options={{ title: 'Invitation' }} />
+        <Stack.Screen name="plan/[id]" options={{ title: 'The plan' }} />
+        <Stack.Screen name="intro" options={{ title: 'Your one-liner' }} />
+        <Stack.Screen name="+not-found" />
+      </Stack.Protected>
+
+      <Stack.Protected guard={!registered}>
+        <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+      </Stack.Protected>
     </Stack>
   );
 }

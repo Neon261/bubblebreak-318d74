@@ -10,6 +10,7 @@ import { PersonAvatar } from '@/components/PersonAvatar';
 import { PingMap } from '@/components/PingMap';
 import { ReadyPicker } from '@/components/ReadyPicker';
 import { SpotCard } from '@/components/SpotCard';
+import { VerifiedBadge } from '@/components/VerifiedBadge';
 import { useTicker } from '@/hooks/useTicker';
 import {
   distanceKm,
@@ -95,15 +96,17 @@ export default function InviteScreen() {
     >
       <Surface variant="secondary" className="flex-row items-center gap-3 rounded-3xl p-4">
         <PersonAvatar
-          name={hostName(ping, profile.name)}
+          name={hostName(ping, profile.firstName)}
           colorClass={host?.colorClass ?? 'bg-sky'}
           size="lg"
         />
         <View className="flex-1 gap-0.5">
-          <Typography type="body" weight="semibold">
-            {host?.name ?? 'Someone nearby'}
-            {host ? `, ${host.age}` : ''}
-          </Typography>
+          <View className="flex-row items-center gap-2">
+            <Typography type="body" weight="semibold">
+              {host?.name ?? 'Someone nearby'}
+            </Typography>
+            <VerifiedBadge label="ID verified" />
+          </View>
           <Typography type="body-sm" color="muted">
             {host?.bio ?? 'Someone with the app close to you'}
           </Typography>
@@ -134,7 +137,7 @@ export default function InviteScreen() {
           <JoinerRow
             key={participant.personId}
             participant={participant}
-            myName={profile.name}
+            myName={profile.firstName}
             isHost={participant.personId === ping.hostId}
           />
         ))}

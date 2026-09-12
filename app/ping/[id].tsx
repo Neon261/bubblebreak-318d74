@@ -122,7 +122,7 @@ export default function LivePingScreen() {
           <JoinerRow
             key={join.personId}
             participant={join}
-            myName={profile.name}
+            myName={profile.firstName}
             isHost={join.personId === ping.hostId}
           />
         ))}
@@ -135,7 +135,7 @@ export default function LivePingScreen() {
         <Typography type="h4">Meet at {formatClock(previewTime)}</Typography>
         <Typography type="body-sm" color="muted">
           {slowest
-            ? `Waits for ${participantName(slowest, profile.name)}: ${slowest.readyMinutes} min to get ready plus ${slowest.travelMinutes} min travel.`
+            ? `Waits for ${participantName(slowest, profile.firstName)}: ${slowest.readyMinutes} min to get ready plus ${slowest.travelMinutes} min travel.`
             : 'Waits for whoever needs the longest.'}
         </Typography>
         <Typography type="body-sm" color="muted">

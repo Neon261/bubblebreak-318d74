@@ -186,7 +186,7 @@ export default function PingHomeScreen() {
             <PingSummaryCard
               key={ping.id}
               ping={ping}
-              myName={profile.name}
+              myName={profile.firstName}
               onPress={() => router.push(pingRoute(ping))}
             />
           ))}

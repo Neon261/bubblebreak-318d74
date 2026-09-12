@@ -2,6 +2,7 @@ import { Typography } from 'heroui-native';
 import { View } from 'react-native';
 
 import { PersonAvatar } from '@/components/PersonAvatar';
+import { VerifiedBadge } from '@/components/VerifiedBadge';
 import { etaMinutes, formatClock, formatDistance, travelModeLabel } from '@/lib/geo';
 import { PEOPLE_BY_ID } from '@/lib/mockData';
 import { participantColorClass, participantName } from '@/lib/pings';
@@ -36,6 +37,7 @@ export function JoinerRow({ participant, myName, meetAt, isHost }: JoinerRowProp
               </Typography>
             </View>
           ) : null}
+          {isMe ? null : <VerifiedBadge />}
         </View>
         <Typography type="body-xs" color="muted" truncate>
           {bio}

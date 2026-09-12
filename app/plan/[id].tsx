@@ -54,7 +54,7 @@ export default function PlanScreen() {
     );
   }
 
-  const host = hostName(ping, profile.name);
+  const host = hostName(ping, profile.firstName);
   const leaveBy = ping.meetAt && mine ? ping.meetAt - mine.travelMinutes * 60_000 : undefined;
 
   return (
@@ -151,7 +151,7 @@ export default function PlanScreen() {
           <JoinerRow
             key={participant.personId}
             participant={participant}
-            myName={profile.name}
+            myName={profile.firstName}
             meetAt={ping.meetAt}
             isHost={participant.personId === ping.hostId}
           />
@@ -167,9 +167,9 @@ export default function PlanScreen() {
             </Typography>
           </View>
           <Typography type="body-sm" color="muted">
-            {participantName(slowest, profile.name)} needs the longest: {slowest.readyMinutes} min
-            to get ready plus {slowest.travelMinutes} min to get there. Everyone else has slack, and
-            there is a five minute buffer on top.
+            {participantName(slowest, profile.firstName)} needs the longest: {slowest.readyMinutes}{' '}
+            min to get ready plus {slowest.travelMinutes} min to get there. Everyone else has slack,
+            and there is a five minute buffer on top.
           </Typography>
         </Surface>
       ) : null}
