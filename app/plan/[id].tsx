@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Button, Spinner, Surface, Typography } from 'heroui-native';
-import { CalendarX, Clock, MapPin, Navigation, Users } from 'lucide-react-native';
+import { Button, PressableFeedback, Spinner, Surface, Typography } from 'heroui-native';
+import { CalendarX, ChevronLeft, Clock, MapPin, Navigation, Users } from 'lucide-react-native';
 import { Linking, Platform, ScrollView, View } from 'react-native';
 
 import { BubbleField } from '@/components/BubbleField';
@@ -84,6 +84,19 @@ export default function PlanScreen() {
       contentContainerClassName="gap-4 px-5 pb-12 pt-4"
       showsVerticalScrollIndicator={false}
     >
+      {ping.status === 'declined' ? (
+        <PressableFeedback
+          onPress={() => goBackOrReplace('/(tabs)/invites')}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          className="self-start"
+        >
+          <View className="border-border h-9 w-9 items-center justify-center rounded-full border">
+            <ChevronLeft color={BRAND.ink} size={18} />
+          </View>
+        </PressableFeedback>
+      ) : null}
+
       {ping.status === 'cancelled' ? (
         <Surface variant="secondary" className="gap-1 rounded-3xl p-4">
           <Typography type="body" weight="semibold">
