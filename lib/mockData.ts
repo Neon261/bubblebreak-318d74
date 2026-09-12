@@ -1,10 +1,10 @@
-import { HAMBURG_SPOTS, HOME, offsetFromHome } from '@/lib/hamburgSpots';
+import { HAMBURG_CENTER, HAMBURG_SPOTS, HOME, offsetFromHome } from '@/lib/hamburgSpots';
 import type { Interest, Person, Spot } from '@/lib/types';
 
 /** Everything time-based is relative to when the app session started. */
 export const SESSION_START = Date.now();
 
-export { HOME };
+export { HAMBURG_CENTER, HOME };
 
 /** Curated Hamburg places and today-only events. */
 export const SPOTS: Spot[] = HAMBURG_SPOTS;
@@ -21,6 +21,12 @@ export const INTEREST_LABELS: Record<Interest, string> = {
   games: 'Games',
   talks: 'Talks',
   dance: 'Dance',
+  cinema: 'Cinema',
+  books: 'Books & reading',
+  wellness: 'Wellness',
+  nightlife: 'Nightlife',
+  photography: 'Photography',
+  volunteering: 'Volunteering',
 };
 
 export const ALL_INTERESTS: Interest[] = [
@@ -32,6 +38,12 @@ export const ALL_INTERESTS: Interest[] = [
   'games',
   'talks',
   'dance',
+  'cinema',
+  'books',
+  'wellness',
+  'nightlife',
+  'photography',
+  'volunteering',
 ];
 
 export function spotStartsAt(spot: Spot): number | undefined {

@@ -13,8 +13,8 @@ import { SpotCard } from '@/components/SpotCard';
 import { SpotMap } from '@/components/SpotMap';
 import { SpotPreviewCard } from '@/components/SpotPreviewCard';
 import { distanceKm, travelMinutes } from '@/lib/geo';
-import { HOME, SPOTS } from '@/lib/mockData';
-import { clampSpots } from '@/lib/pings';
+import { SPOTS } from '@/lib/mockData';
+import { clampSpots, currentLocation } from '@/lib/pings';
 import { startPingSimulation } from '@/lib/simulation';
 import { useAppStore } from '@/lib/store';
 import { BRAND } from '@/lib/theme';
@@ -42,15 +42,16 @@ export default function DiscoverScreen() {
   const profile = useAppStore((state) => state.profile);
   const updateProfile = useAppStore((state) => state.updateProfile);
   const createPing = useAppStore((state) => state.createPing);
+  const origin = currentLocation(profile);
 
   const items = useMemo(
     () =>
-      SPOTS.map((spot) => ({ spot, km: distanceKm(HOME, spot.location) }))
+      SPOTS.map((spot) => ({ spot, km: distanceKm(origin, spot.location) }))
         .filter(
           ({ spot, km }) => km <= profile.radiusKm && (filter === 'all' || spot.kind === filter),
         )
         .sort((a, b) => a.km - b.km),
-    [filter, profile.radiusKm],
+    [filter, origin, profile.radiusKm],
   );
 
   // A different set means starting the rotation from the nearest options again.
@@ -154,7 +155,7 @@ export default function DiscoverScreen() {
       ) : mode === 'map' ? (
         <View className="gap-3">
           <SpotMap
-            home={HOME}
+            home={origin}
             spots={shown.map((item) => item.spot)}
             radiusKm={profile.radiusKm}
             selectedId={selected?.spot.id}

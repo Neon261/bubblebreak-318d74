@@ -9,6 +9,12 @@ import type { Coordinate, Spot, SpotSource, SpotSourceId } from '@/lib/types';
  * kilometres away, and Winterhude, Barmbek and Wilhelmsburg at the far edge of
  * the 10 km radius.
  */
+export const HAMBURG_CENTER: { latitude: number; longitude: number; label: string } = {
+  latitude: 53.5506,
+  longitude: 9.9933,
+  label: 'Hamburg city centre',
+};
+
 export const HOME: { latitude: number; longitude: number; label: string } = {
   latitude: 53.5514,
   longitude: 9.9245,

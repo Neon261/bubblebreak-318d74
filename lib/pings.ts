@@ -1,8 +1,15 @@
 import type { Href } from 'expo-router';
 
 import { computeMeetAt, etaMinutes } from '@/lib/geo';
-import { PEOPLE_BY_ID, SPOTS_BY_ID } from '@/lib/mockData';
-import { ME, type Participant, type Ping, type Spot } from '@/lib/types';
+import { HAMBURG_CENTER, PEOPLE_BY_ID, SPOTS_BY_ID } from '@/lib/mockData';
+import {
+  ME,
+  type Coordinate,
+  type Participant,
+  type Ping,
+  type Profile,
+  type Spot,
+} from '@/lib/types';
 
 /** How many people a host can let in besides themselves. */
 export const SPOT_OPTIONS = [1, 2, 3, 4, 5];
@@ -35,6 +42,31 @@ export function isHostedByMe(ping: Ping): boolean {
 
 export function myJoin(ping: Ping): Participant | undefined {
   return ping.joins.find((join) => join.personId === ME);
+}
+
+export function currentLocation(profile: Profile): Coordinate {
+  return profile.locationPermission === 'granted' && profile.location
+    ? profile.location
+    : HAMBURG_CENTER;
+}
+
+export function currentLocationLabel(profile: Profile): string {
+  return profile.locationPermission === 'granted' ? 'Your current location' : HAMBURG_CENTER.label;
+}
+
+export function expectedArrivalAt(participant: Participant): number {
+  return participant.joinedAt + etaMinutes(participant) * 60_000;
+}
+
+export function canOpenChat(ping: Ping): boolean {
+  return ping.myResponse === 'joined' && ping.status !== 'cancelled' && Boolean(myJoin(ping));
+}
+
+export function canCancelHostedPing(ping: Ping, now = Date.now()): boolean {
+  if (ping.hostId !== ME || ping.status === 'cancelled' || ping.status === 'declined') return false;
+  const hasGuests = ping.joins.some((join) => join.personId !== ME);
+  if (!hasGuests || ping.meetAt === undefined) return true;
+  return ping.meetAt - now > 60 * 60_000;
 }
 
 export function pingSpot(ping: Ping): Spot | undefined {

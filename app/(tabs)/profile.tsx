@@ -7,14 +7,11 @@ import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { BubbleField } from '@/components/BubbleField';
 import { Heading } from '@/components/Heading';
 import { PersonAvatar } from '@/components/PersonAvatar';
-import { GroupSizePicker } from '@/components/GroupSizePicker';
-import { RadiusSlider } from '@/components/RadiusSlider';
-import { ReadyPicker } from '@/components/ReadyPicker';
 import { VerifiedBadge } from '@/components/VerifiedBadge';
 import { TRAVEL_MODES, travelModeLabel } from '@/lib/geo';
-import { ALL_INTERESTS, HOME, INTEREST_LABELS } from '@/lib/mockData';
-import { clampSpots } from '@/lib/pings';
-import { peopleInRadius, useAppStore } from '@/lib/store';
+import { ALL_INTERESTS, INTEREST_LABELS } from '@/lib/mockData';
+import { currentLocationLabel } from '@/lib/pings';
+import { useAppStore } from '@/lib/store';
 import { BRAND } from '@/lib/theme';
 import type { Interest } from '@/lib/types';
 
@@ -52,7 +49,7 @@ export default function ProfileScreen() {
           <View className="flex-1 gap-1">
             <Heading type="h3">{profile.firstName}</Heading>
             <Typography type="body-sm" color="muted">
-              {HOME.label}
+              {currentLocationLabel(profile)}
             </Typography>
             <View className="flex-row">
               <VerifiedBadge label={`Verified by ${profile.verification.provider}`} />
@@ -160,28 +157,8 @@ export default function ProfileScreen() {
             </View>
           </View>
 
-          <ReadyPicker
-            value={profile.defaultReadyMinutes}
-            onChange={(minutes) => updateProfile({ defaultReadyMinutes: minutes })}
-            label="Your usual head start"
-            hint="Pre-filled when you join something. You can change it every time."
-          />
-
-          <GroupSizePicker
-            value={clampSpots(profile.defaultSpots)}
-            onChange={(count) => updateProfile({ defaultSpots: count })}
-            label="How big your groups get"
-            hint={`Pings you start let ${clampSpots(profile.defaultSpots)} ${clampSpots(profile.defaultSpots) === 1 ? 'person' : 'people'} in besides you. You can change it per ping.`}
-          />
         </Surface>
 
-        <Surface variant="default" className="gap-3 rounded-3xl p-4">
-          <RadiusSlider
-            radiusKm={profile.radiusKm}
-            onChange={(km) => updateProfile({ radiusKm: km })}
-            hint={`${peopleInRadius(profile.radiusKm).length} people with the app are inside this radius.`}
-          />
-        </Surface>
 
         <Surface variant="default" className="gap-4 rounded-3xl p-4">
           <View className="flex-row items-center gap-4">

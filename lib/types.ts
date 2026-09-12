@@ -11,7 +11,13 @@ export type Interest =
   | 'outdoors'
   | 'games'
   | 'talks'
-  | 'dance';
+  | 'dance'
+  | 'cinema'
+  | 'books'
+  | 'wellness'
+  | 'nightlife'
+  | 'photography'
+  | 'volunteering';
 
 export type SpotKind = 'place' | 'event';
 
@@ -114,6 +120,13 @@ export interface Participant {
 
 export type PingStatus = 'open' | 'locked' | 'cancelled' | 'declined';
 
+export interface ChatMessage {
+  id: string;
+  senderId: ParticipantId;
+  body: string;
+  sentAt: number;
+}
+
 export interface Ping {
   id: string;
   hostId: ParticipantId;
@@ -134,6 +147,9 @@ export interface Ping {
   /** Inbound pings: whether I already answered. */
   myResponse: 'none' | 'joined' | 'passed';
   seen: boolean;
+  /** Prototype conversation; one-to-one when there is one guest, otherwise a group. */
+  messages: ChatMessage[];
+  cancelledAt?: number;
 }
 
 /** The five sides of a person the app asks about during registration. */
@@ -175,6 +191,9 @@ export interface Profile {
   /** How many people I let into a ping I start, 1-5. */
   defaultSpots: number;
   radiusKm: number;
+  /** Uses Hamburg city centre until foreground GPS access is granted. */
+  locationPermission: 'notAsked' | 'granted' | 'denied';
+  location?: Coordinate;
   openToPings: boolean;
   notificationsEnabled: boolean;
   verification: VerificationInfo;

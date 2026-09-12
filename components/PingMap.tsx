@@ -2,26 +2,23 @@ import { useMemo } from 'react';
 import { View } from 'react-native';
 
 import MapView, { type MapCircle, type MapMarker } from '@/components/MapView';
-import { PEOPLE_BY_ID } from '@/lib/mockData';
-import type { Coordinate, Participant, Spot } from '@/lib/types';
-import { ME } from '@/lib/types';
+import type { Coordinate, Spot } from '@/lib/types';
 
 interface PingMapProps {
   /** Your position — the map centers between you and the spot. */
   home: Coordinate;
   spot?: Spot;
   radiusKm?: number;
-  joins?: Participant[];
   height?: number;
+  onPress?: () => void;
 }
 
 const MARKER_COLORS = {
   home: '#146a70',
   spot: '#c34b2e',
-  joiner: '#9b7fc4',
 } as const;
 
-export function PingMap({ home, spot, radiusKm, joins = [], height = 200 }: PingMapProps) {
+export function PingMap({ home, spot, radiusKm, height = 200, onPress }: PingMapProps) {
   const markers = useMemo<MapMarker[]>(() => {
     const list: MapMarker[] = [
       { id: 'home', coordinate: home, title: 'You', color: MARKER_COLORS.home },
@@ -37,20 +34,8 @@ export function PingMap({ home, spot, radiusKm, joins = [], height = 200 }: Ping
       });
     }
 
-    joins.forEach((join) => {
-      if (join.personId === ME) return;
-      const person = PEOPLE_BY_ID[join.personId];
-      if (!person) return;
-      list.push({
-        id: person.id,
-        coordinate: person.location,
-        title: person.name,
-        color: MARKER_COLORS.joiner,
-      });
-    });
-
     return list;
-  }, [home, joins, spot]);
+  }, [home, spot]);
 
   const circles = useMemo<MapCircle[]>(
     () =>
@@ -89,6 +74,7 @@ export function PingMap({ home, spot, radiusKm, joins = [], height = 200 }: Ping
         region={region}
         markers={markers}
         circles={circles}
+        onPress={onPress ? () => onPress() : undefined}
         scrollEnabled={false}
         zoomEnabled={false}
         style={{ height, width: '100%' }}

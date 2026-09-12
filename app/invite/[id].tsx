@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Button, Surface, Typography } from 'heroui-native';
+import { Button, Chip, Surface, Typography } from 'heroui-native';
 import { Inbox, Users } from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
 
@@ -14,6 +14,7 @@ import { SpotCard } from '@/components/SpotCard';
 import { VerifiedBadge } from '@/components/VerifiedBadge';
 import { useTicker } from '@/hooks/useTicker';
 import {
+  TRAVEL_MODES,
   distanceKm,
   formatClock,
   formatDistance,
@@ -21,13 +22,13 @@ import {
   travelMinutes,
   travelModeLabel,
 } from '@/lib/geo';
-import { HOME, PEOPLE_BY_ID } from '@/lib/mockData';
+import { PEOPLE_BY_ID } from '@/lib/mockData';
 import { goBackOrReplace } from '@/lib/navigation';
-import { hostName, pingSpot, spotsLeft } from '@/lib/pings';
+import { currentLocation, hostName, pingSpot, spotsLeft } from '@/lib/pings';
 import { scheduleHostPlan } from '@/lib/simulation';
 import { useAppStore } from '@/lib/store';
 import { BRAND } from '@/lib/theme';
-import type { ReadyMinutes } from '@/lib/types';
+import type { ReadyMinutes, TravelMode } from '@/lib/types';
 
 export default function InviteScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -42,15 +43,14 @@ export default function InviteScreen() {
   const markSeen = useAppStore((state) => state.markSeen);
 
   const [ready, setReady] = useState<ReadyMinutes>(profile.defaultReadyMinutes);
+  const [travelMode, setTravelMode] = useState<TravelMode>(profile.travelMode);
+  const origin = currentLocation(profile);
 
   const spot = ping ? pingSpot(ping) : undefined;
   const host = ping ? PEOPLE_BY_ID[ping.hostId] : undefined;
 
-  const myKm = spot ? distanceKm(HOME, spot.location) : 0;
-  const myTravel = useMemo(
-    () => travelMinutes(myKm, profile.travelMode),
-    [myKm, profile.travelMode],
-  );
+  const myKm = spot ? distanceKm(origin, spot.location) : 0;
+  const myTravel = useMemo(() => travelMinutes(myKm, travelMode), [myKm, travelMode]);
 
   useEffect(() => {
     if (ping && !ping.seen) markSeen(ping.id);
@@ -78,7 +78,7 @@ export default function InviteScreen() {
 
   const join = () => {
     // First come, first in: somebody may have taken the last spot while I looked.
-    if (!joinInbound(ping.id, ready, profile.travelMode)) return;
+    if (!joinInbound(ping.id, ready, travelMode)) return;
     scheduleHostPlan(ping.id);
     router.replace({ pathname: '/plan/[id]', params: { id: ping.id } });
   };
@@ -119,7 +119,7 @@ export default function InviteScreen() {
             {host?.bio ?? 'Someone with the app close to you'}
           </Typography>
           <Typography type="body-xs" color="muted">
-            {host ? formatDistance(distanceKm(HOME, host.location)) : ''} away ·{' '}
+            {host ? formatDistance(distanceKm(origin, host.location)) : ''} away ·{' '}
             {formatRelative(ping.createdAt)}
           </Typography>
         </View>
@@ -129,10 +129,10 @@ export default function InviteScreen() {
         spot={spot}
         distanceKm={myKm}
         travelMinutes={myTravel}
-        travelMode={profile.travelMode}
+        travelMode={travelMode}
       />
 
-      <PingMap home={HOME} spot={spot} joins={ping.joins} height={180} />
+      <PingMap home={origin} spot={spot} height={180} />
 
       <Surface variant="default" className="gap-1 rounded-3xl p-4">
         <View className="flex-row items-center gap-2 pb-1">
@@ -167,10 +167,25 @@ export default function InviteScreen() {
         </Surface>
       ) : (
         <Surface variant="default" className="gap-4 rounded-3xl p-4">
+          <View className="gap-3">
+            <Typography type="body-sm" weight="medium">How will you get there?</Typography>
+            <View className="flex-row flex-wrap gap-2">
+              {TRAVEL_MODES.map((mode) => (
+                <Chip
+                  key={mode}
+                  variant={travelMode === mode ? 'primary' : 'tertiary'}
+                  color={travelMode === mode ? 'accent' : 'default'}
+                  onPress={() => setTravelMode(mode)}
+                >
+                  <Chip.Label>{travelModeLabel(mode)}</Chip.Label>
+                </Chip>
+              ))}
+            </View>
+          </View>
           <ReadyPicker
             value={ready}
             onChange={setReady}
-            hint={`You are ${formatDistance(myKm)} from there — about ${myTravel} min ${travelModeLabel(profile.travelMode)}.`}
+            hint={`You are ${formatDistance(myKm)} from there — about ${myTravel} min ${travelModeLabel(travelMode)}.`}
           />
           <View className="bg-accent-soft rounded-2xl px-3 py-2">
             <Typography type="body-sm" className="text-accent-soft-foreground">

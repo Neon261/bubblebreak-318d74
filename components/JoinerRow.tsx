@@ -11,12 +11,12 @@ import { ME, type Participant } from '@/lib/types';
 interface JoinerRowProps {
   participant: Participant;
   myName: string;
-  /** When the plan is set, show the arrival clock instead of an estimate. */
-  meetAt?: number;
+  /** Calculated arrival from ready time, distance, and transport. */
+  arrivalAt?: number;
   isHost?: boolean;
 }
 
-export function JoinerRow({ participant, myName, meetAt, isHost }: JoinerRowProps) {
+export function JoinerRow({ participant, myName, arrivalAt, isHost }: JoinerRowProps) {
   const isMe = participant.personId === ME;
   const name = participantName(participant, myName);
   const bio = isMe ? 'You' : PEOPLE_BY_ID[participant.personId]?.bio;
@@ -46,7 +46,7 @@ export function JoinerRow({ participant, myName, meetAt, isHost }: JoinerRowProp
 
       <View className="items-end gap-0.5">
         <Typography type="body-sm" weight="medium">
-          {meetAt ? formatClock(meetAt) : `${etaMinutes(participant)} min`}
+          {arrivalAt ? formatClock(arrivalAt) : `${etaMinutes(participant)} min`}
         </Typography>
         <Typography type="body-xs" color="muted">
           {participant.readyMinutes} min ready · {formatDistance(participant.distanceKm)}{' '}

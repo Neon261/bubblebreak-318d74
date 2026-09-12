@@ -23,6 +23,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ios: {
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
+        NSLocationWhenInUseUsageDescription:
+          'BubbleBreak uses your location to show nearby activities and estimate your arrival time.',
       },
       supportsTablet: true,
       bundleIdentifier: process.env.BILT_IOS_BUNDLE_ID ?? 'me.bilt.bubblebreak',
@@ -40,7 +42,18 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     extra: {
       appStoreAppId: process.env.BILT_APP_STORE_APP_ID,
     },
-    plugins: ['expo-router', 'expo-font', ...nativePlugins],
+    plugins: [
+      'expo-router',
+      'expo-font',
+      [
+        'expo-location',
+        {
+          locationWhenInUsePermission:
+            'Allow BubbleBreak to use your location for nearby activities and arrival estimates.',
+        },
+      ],
+      ...nativePlugins,
+    ],
     experiments: {
       typedRoutes: true,
       reactCompiler: true,

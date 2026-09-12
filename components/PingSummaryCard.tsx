@@ -14,6 +14,7 @@ interface PingSummaryCardProps {
   ping: Ping;
   myName: string;
   onPress: () => void;
+  showDetails?: boolean;
 }
 
 function statusLine(ping: Ping): string {
@@ -30,7 +31,7 @@ function statusLine(ping: Ping): string {
   return `${left} ${left === 1 ? 'spot' : 'spots'} left · ${formatRelative(ping.createdAt)}`;
 }
 
-export function PingSummaryCard({ ping, myName, onPress }: PingSummaryCardProps) {
+export function PingSummaryCard({ ping, myName, onPress, showDetails = false }: PingSummaryCardProps) {
   const spot = pingSpot(ping);
   const host = hostName(ping, myName);
   const colorClass = isHostedByMe(ping)
@@ -39,24 +40,50 @@ export function PingSummaryCard({ ping, myName, onPress }: PingSummaryCardProps)
   const category = spot ? CATEGORY_VISUALS[spot.category] : undefined;
   const Icon = category?.icon;
 
+  const hostBio = ping.hostId === 'me' ? undefined : PEOPLE_BY_ID[ping.hostId]?.bio;
+
   return (
     <PressableFeedback onPress={onPress} accessibilityRole="button">
-      <Surface variant="default" className="flex-row items-center gap-3 rounded-3xl p-4">
-        <PersonAvatar name={host} colorClass={colorClass} />
+      <Surface variant="default" className="gap-3 rounded-3xl p-4">
+        <View className="flex-row items-center gap-3">
+          <PersonAvatar name={host} colorClass={colorClass} />
 
-        <View className="flex-1 gap-0.5">
-          <Typography type="body-sm" weight="semibold" truncate>
-            {isHostedByMe(ping) ? 'You' : host} → {spot?.name ?? 'Somewhere nearby'}
-          </Typography>
-          <View className="flex-row items-center gap-1.5">
-            {Icon ? <Icon color={BRAND.muted} size={13} /> : null}
-            <Typography type="body-xs" color="muted" truncate>
-              {statusLine(ping)}
+          <View className="flex-1 gap-0.5">
+            <Typography type="body-sm" weight="semibold" truncate>
+              {isHostedByMe(ping) ? 'You' : host} → {spot?.name ?? 'Somewhere nearby'}
             </Typography>
+            <View className="flex-row items-center gap-1.5">
+              {Icon ? <Icon color={BRAND.muted} size={13} /> : null}
+              <Typography type="body-xs" color="muted" truncate>
+                {statusLine(ping)}
+              </Typography>
+            </View>
           </View>
+
+          <ChevronRight color={BRAND.muted} size={18} />
         </View>
 
-        <ChevronRight color={BRAND.muted} size={18} />
+        {showDetails ? (
+          <View className="border-border gap-1.5 border-t pt-3">
+            <Typography type="body-xs">
+              <Typography type="body-xs" weight="semibold">What: </Typography>
+              {spot?.tagline ?? 'A nearby activity'}
+            </Typography>
+            <Typography type="body-xs">
+              <Typography type="body-xs" weight="semibold">Where: </Typography>
+              {spot?.address ?? 'Shared after you join'}
+            </Typography>
+            <Typography type="body-xs" color="muted">
+              {spotsLeft(ping)} {spotsLeft(ping) === 1 ? 'spot' : 'spots'} left · Posted{' '}
+              {formatRelative(ping.createdAt)}
+            </Typography>
+            {hostBio ? (
+              <Typography type="body-xs" color="muted" numberOfLines={2}>
+                “{hostBio}”
+              </Typography>
+            ) : null}
+          </View>
+        ) : null}
       </Surface>
     </PressableFeedback>
   );

@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button, Spinner, Surface, Typography } from 'heroui-native';
-import { CalendarX, Clock, MapPin, Users } from 'lucide-react-native';
-import { ScrollView, View } from 'react-native';
+import { CalendarX, Clock, MapPin, Navigation, Users } from 'lucide-react-native';
+import { Linking, Platform, ScrollView, View } from 'react-native';
 
 import { BubbleField } from '@/components/BubbleField';
 import { EmptyState } from '@/components/EmptyState';
@@ -11,9 +11,11 @@ import { JoinerRow } from '@/components/JoinerRow';
 import { PingMap } from '@/components/PingMap';
 import { useTicker } from '@/hooks/useTicker';
 import { formatClock, formatCountdown, formatDistance } from '@/lib/geo';
-import { HOME } from '@/lib/mockData';
 import { goBackOrReplace } from '@/lib/navigation';
 import {
+  canCancelHostedPing,
+  currentLocation,
+  expectedArrivalAt,
   hostName,
   isHostedByMe,
   myJoin,
@@ -33,6 +35,8 @@ export default function PlanScreen() {
   const ping = useAppStore((state) => state.pings[pingId]);
   const profile = useAppStore((state) => state.profile);
   const leavePing = useAppStore((state) => state.leavePing);
+  const cancelPing = useAppStore((state) => state.cancelPing);
+  const deleteDraft = useAppStore((state) => state.deleteDraft);
 
   const spot = ping ? pingSpot(ping) : undefined;
   const mine = ping ? myJoin(ping) : undefined;
@@ -57,7 +61,22 @@ export default function PlanScreen() {
   }
 
   const host = hostName(ping, profile.firstName);
+  const origin = currentLocation(profile);
+  const hostedByMe = isHostedByMe(ping);
+  const hasGuests = ping.joins.some((join) => join.personId !== ping.hostId);
+  const isDraft = hostedByMe && ping.status === 'open' && !hasGuests;
+  const hostCanCancel = canCancelHostedPing(ping, now);
   const leaveBy = ping.meetAt && mine ? ping.meetAt - mine.travelMinutes * 60_000 : undefined;
+
+  const openNavigation = () => {
+    const destination = `${spot.location.latitude},${spot.location.longitude}`;
+    const label = encodeURIComponent(spot.name);
+    const url =
+      Platform.OS === 'ios'
+        ? `http://maps.apple.com/?daddr=${destination}&q=${label}`
+        : `https://www.google.com/maps/dir/?api=1&destination=${destination}`;
+    void Linking.openURL(url);
+  };
 
   return (
     <ScrollView
@@ -148,7 +167,15 @@ export default function PlanScreen() {
           <Typography type="body-sm">Find each other: {spot.meetingHint}</Typography>
         </View>
 
-        <PingMap home={HOME} spot={spot} joins={ping.joins} height={200} />
+        <PingMap home={origin} spot={spot} height={200} onPress={openNavigation} />
+        <Button variant="secondary" size="sm" onPress={openNavigation}>
+          <Navigation color={BRAND.accent} size={15} />
+          <Button.Label>Open navigation</Button.Label>
+        </Button>
+        <Typography type="body-xs" color="muted">
+          For safety, this map only shows your location and the destination. Tap it to open{' '}
+          {Platform.OS === 'ios' ? 'Apple Maps' : 'Google Maps'}.
+        </Typography>
 
         <Typography type="body-sm" color="muted">
           {spot.description}
@@ -167,7 +194,7 @@ export default function PlanScreen() {
             key={participant.personId}
             participant={participant}
             myName={profile.firstName}
-            meetAt={ping.meetAt}
+            arrivalAt={expectedArrivalAt(participant)}
             isHost={participant.personId === ping.hostId}
           />
         ))}
@@ -196,9 +223,47 @@ export default function PlanScreen() {
       ) : null}
 
       {mine && ping.status !== 'cancelled' ? (
-        <Button variant="danger-soft" onPress={() => leavePing(ping.id)}>
-          <Button.Label>{isHostedByMe(ping) ? 'Call it off' : 'Leave the plan'}</Button.Label>
-        </Button>
+        <View className="gap-2">
+          {hostedByMe ? (
+            isDraft ? (
+              <Button
+                variant="danger-soft"
+                onPress={() => {
+                  if (deleteDraft(ping.id)) goBackOrReplace('/(tabs)/plans');
+                }}
+              >
+                <Button.Label>Delete draft plan</Button.Label>
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="danger-soft"
+                  isDisabled={!hostCanCancel}
+                  onPress={() => {
+                    if (cancelPing(ping.id)) goBackOrReplace('/(tabs)/plans');
+                  }}
+                >
+                  <Button.Label>Cancel plan</Button.Label>
+                </Button>
+                {!hostCanCancel ? (
+                  <Typography type="body-xs" color="muted" align="center">
+                    You cannot cancel within one hour of the start after someone has agreed to join.
+                  </Typography>
+                ) : null}
+              </>
+            )
+          ) : (
+            <Button
+              variant="danger-soft"
+              onPress={() => {
+                leavePing(ping.id);
+                goBackOrReplace('/(tabs)/invites');
+              }}
+            >
+              <Button.Label>Cancel my place</Button.Label>
+            </Button>
+          )}
+        </View>
       ) : (
         <Button variant="secondary" onPress={() => router.push('/discover')}>
           <Button.Label>Find something else</Button.Label>

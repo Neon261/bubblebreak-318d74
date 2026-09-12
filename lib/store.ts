@@ -11,9 +11,16 @@ import {
   switchedIntroPick,
   withIntroPicks,
 } from '@/lib/introSentence';
-import { HOME, PEOPLE, SPOTS_BY_ID } from '@/lib/mockData';
-import { clampSpots, spotsLeft, spotsTaken } from '@/lib/pings';
+import { PEOPLE, SPOTS_BY_ID } from '@/lib/mockData';
 import {
+  canCancelHostedPing,
+  clampSpots,
+  currentLocation,
+  spotsLeft,
+  spotsTaken,
+} from '@/lib/pings';
+import {
+  type Coordinate,
   type IntroCategoryId,
   ME,
   type Participant,
@@ -34,6 +41,7 @@ const DEFAULT_PROFILE: Profile = {
   defaultReadyMinutes: 30,
   defaultSpots: 3,
   radiusKm: 3,
+  locationPermission: 'notAsked',
   openToPings: true,
   notificationsEnabled: false,
   verification: { status: 'unverified' },
@@ -71,6 +79,7 @@ export interface AppState {
   /** Newest first. */
   pingIds: string[];
   updateProfile: (patch: Partial<Profile>) => void;
+  setLocation: (permission: Profile['locationPermission'], location?: Coordinate) => void;
   /** Registration step 1. */
   setFirstName: (firstName: string) => void;
   /** Registration step 2: answers the question currently shown for a group. */
@@ -96,7 +105,9 @@ export interface AppState {
   setSpotCount: (pingId: string, spotsForOthers: number) => void;
   /** Host sends the meeting point and time to everyone who joined. */
   lockPing: (pingId: string) => void;
-  cancelPing: (pingId: string) => void;
+  cancelPing: (pingId: string) => boolean;
+  deleteDraft: (pingId: string) => boolean;
+  sendMessage: (pingId: string, body: string) => void;
   /** Returns false when the last spot went before I tapped join. */
   joinInbound: (pingId: string, readyMinutes: ReadyMinutes, travelMode: TravelMode) => boolean;
   passInbound: (pingId: string) => void;
@@ -121,8 +132,8 @@ function patchPings(
 }
 
 /** Who is close enough to get buzzed about a ping. */
-export function peopleInRadius(radiusKm: number): string[] {
-  return PEOPLE.filter((person) => distanceKm(HOME, person.location) <= radiusKm).map(
+export function peopleInRadius(radiusKm: number, origin: Coordinate): string[] {
+  return PEOPLE.filter((person) => distanceKm(origin, person.location) <= radiusKm).map(
     (person) => person.id,
   );
 }
@@ -131,9 +142,10 @@ export function myParticipant(
   spotId: string,
   readyMinutes: ReadyMinutes,
   travelMode: TravelMode,
+  origin: Coordinate,
 ): Participant {
   const spot = SPOTS_BY_ID[spotId];
-  const km = spot ? distanceKm(HOME, spot.location) : 0;
+  const km = spot ? distanceKm(origin, spot.location) : 0;
   return {
     personId: ME,
     readyMinutes,
@@ -152,6 +164,15 @@ export const useAppStore = create<AppState>()(
       pingIds: [],
 
       updateProfile: (patch) => set((state) => ({ profile: { ...state.profile, ...patch } })),
+
+      setLocation: (permission, location) =>
+        set((state) => ({
+          profile: {
+            ...state.profile,
+            locationPermission: permission,
+            location: permission === 'granted' ? location : undefined,
+          },
+        })),
 
       setFirstName: (firstName) =>
         set((state) => ({ profile: withIntro({ ...state.profile, firstName: firstName.trim() }) })),
@@ -226,20 +247,24 @@ export const useAppStore = create<AppState>()(
       createPing: (spotId, radiusKm, spotsForOthers) => {
         const id = nextId('ping');
         const { profile } = get();
+        const origin = currentLocation(profile);
         const ping: Ping = {
           id,
           hostId: ME,
           spotId,
           radiusKm,
           createdAt: Date.now(),
-          notifiedIds: peopleInRadius(radiusKm),
+          notifiedIds: peopleInRadius(radiusKm, origin),
           passedIds: [],
           missedIds: [],
           spotsForOthers: clampSpots(spotsForOthers),
-          joins: [myParticipant(spotId, profile.defaultReadyMinutes, profile.travelMode)],
+          joins: [
+            myParticipant(spotId, profile.defaultReadyMinutes, profile.travelMode, origin),
+          ],
           status: 'open',
           myResponse: 'joined',
           seen: true,
+          messages: [],
         };
         set((state) => ({
           pings: { ...state.pings, [id]: ping },
@@ -250,13 +275,13 @@ export const useAppStore = create<AppState>()(
 
       addInboundPing: (ping) =>
         set((state) => ({
-          pings: { ...state.pings, [ping.id]: ping },
+          pings: { ...state.pings, [ping.id]: { ...ping, messages: ping.messages ?? [] } },
           pingIds: [ping.id, ...state.pingIds],
         })),
 
       addJoin: (pingId, participant) => {
         const ping = get().pings[pingId];
-        if (!ping) return false;
+        if (!ping || ping.status !== 'open') return false;
         if (ping.joins.some((join) => join.personId === participant.personId)) return false;
         // First come, first in — a late yes finds the spots gone.
         if (spotsLeft(ping) === 0) return false;
@@ -305,14 +330,56 @@ export const useAppStore = create<AppState>()(
           ),
         })),
 
-      cancelPing: (pingId) =>
+      cancelPing: (pingId) => {
+        const ping = get().pings[pingId];
+        if (!ping || !canCancelHostedPing(ping)) return false;
         set((state) => ({
-          pings: patchPings(state.pings, pingId, (ping) => ({ ...ping, status: 'cancelled' })),
-        })),
+          pings: patchPings(state.pings, pingId, (current) => ({
+            ...current,
+            status: 'cancelled',
+            cancelledAt: Date.now(),
+          })),
+        }));
+        return true;
+      },
+
+      deleteDraft: (pingId) => {
+        const ping = get().pings[pingId];
+        const canDelete =
+          ping?.hostId === ME &&
+          ping.status === 'open' &&
+          !ping.joins.some((join) => join.personId !== ME);
+        if (!canDelete) return false;
+        set((state) => {
+          const { [pingId]: _deleted, ...remaining } = state.pings;
+          return { pings: remaining, pingIds: state.pingIds.filter((id) => id !== pingId) };
+        });
+        return true;
+      },
+
+      sendMessage: (pingId, body) => {
+        const clean = body.trim();
+        if (!clean) return;
+        set((state) => ({
+          pings: patchPings(state.pings, pingId, (ping) => {
+            if (ping.myResponse !== 'joined' || !ping.joins.some((join) => join.personId === ME)) {
+              return ping;
+            }
+            return {
+              ...ping,
+              messages: [
+                ...ping.messages,
+                { id: nextId('message'), senderId: ME, body: clean, sentAt: Date.now() },
+              ],
+            };
+          }),
+        }));
+      },
 
       joinInbound: (pingId, readyMinutes, travelMode) => {
         const ping = get().pings[pingId];
-        if (!ping) return false;
+        if (!ping || ping.status !== 'open') return false;
+        const origin = currentLocation(get().profile);
         const alreadyIn = ping.joins.some((join) => join.personId === ME);
         if (!alreadyIn && spotsLeft(ping) === 0) return false;
         set((state) => ({
@@ -322,7 +389,10 @@ export const useAppStore = create<AppState>()(
             seen: true,
             joins: alreadyIn
               ? current.joins
-              : [...current.joins, myParticipant(current.spotId, readyMinutes, travelMode)],
+              : [
+                  ...current.joins,
+                  myParticipant(current.spotId, readyMinutes, travelMode, origin),
+                ],
           })),
         }));
         return true;

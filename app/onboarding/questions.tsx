@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Button, Typography } from 'heroui-native';
-import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 
 import { IntroQuestionCard } from '@/components/IntroQuestionCard';
 import { OnboardingProgress } from '@/components/OnboardingProgress';
@@ -38,6 +38,7 @@ export default function OnboardingQuestionsScreen() {
   // Switching a question drops its answer, so the next stop is whatever is
   // still blank rather than simply the group after this one.
   const advance = (next: IntroAnswers) => {
+    Keyboard.dismiss();
     if (hasAllIntroAnswers(next)) router.push('/onboarding/sentence');
     else setIndex(Math.min(firstUnansweredIndex(next), INTRO_CATEGORY_COUNT - 1));
   };
@@ -74,6 +75,7 @@ export default function OnboardingQuestionsScreen() {
         </Typography>
 
         <IntroQuestionCard
+          key={`${category.id}-${question.id}`}
           category={category}
           question={question}
           selectedId={answers[category.id]?.optionId}

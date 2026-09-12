@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import * as Location from 'expo-location';
 import { useRouter } from 'expo-router';
 import { Button, PressableFeedback, Surface, Typography } from 'heroui-native';
 import { BellRing, MapPin, Radar, Users } from 'lucide-react-native';
@@ -11,7 +12,6 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated';
-import { useEffect } from 'react';
 
 import { PingSummaryCard } from '@/components/PingSummaryCard';
 import { BubbleField } from '@/components/BubbleField';
@@ -19,8 +19,10 @@ import { Heading, Wordmark } from '@/components/Heading';
 import { RadiusSlider } from '@/components/RadiusSlider';
 import { useTicker } from '@/hooks/useTicker';
 import { distanceKm, formatClock, formatCountdown } from '@/lib/geo';
-import { HOME, SPOTS } from '@/lib/mockData';
+import { SPOTS } from '@/lib/mockData';
 import {
+  currentLocation,
+  currentLocationLabel,
   isHostedByMe,
   isOver,
   isSettled,
@@ -32,13 +34,6 @@ import {
 } from '@/lib/pings';
 import { peopleInRadius, useAppStore } from '@/lib/store';
 import { BRAND } from '@/lib/theme';
-
-const HOW_IT_WORKS = [
-  'Press the button — five places and events inside your radius, rotate for five more.',
-  'Pick one and set how many can come. Everyone nearby with the app gets buzzed, not just your friends.',
-  'Whoever answers first takes a spot and picks how long they need to get ready.',
-  'The app sets the meeting point and a time the slowest person can make.',
-];
 
 /** A shared value that repeatedly animates from 0 to 1, for pulsing UI effects. */
 function usePulse(durationMs: number): SharedValue<number> {
@@ -62,13 +57,22 @@ export default function PingHomeScreen() {
 
   const profile = useAppStore((state) => state.profile);
   const updateProfile = useAppStore((state) => state.updateProfile);
+  const setLocation = useAppStore((state) => state.setLocation);
   const pings = useAppStore((state) => state.pings);
   const pingIds = useAppStore((state) => state.pingIds);
 
-  const nearbyPeople = useMemo(() => peopleInRadius(profile.radiusKm).length, [profile.radiusKm]);
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string>();
+  const origin = currentLocation(profile);
+  const locationLabel = currentLocationLabel(profile);
+
+  const nearbyPeople = useMemo(
+    () => peopleInRadius(profile.radiusKm, origin).length,
+    [origin, profile.radiusKm],
+  );
   const nearbySpots = useMemo(
-    () => SPOTS.filter((spot) => distanceKm(HOME, spot.location) <= profile.radiusKm).length,
-    [profile.radiusKm],
+    () => SPOTS.filter((spot) => distanceKm(origin, spot.location) <= profile.radiusKm).length,
+    [origin, profile.radiusKm],
   );
 
   const all = useMemo(() => pingList(pings, pingIds), [pings, pingIds]);
@@ -89,6 +93,30 @@ export default function PingHomeScreen() {
     opacity: 0.4 * (1 - pulse.value),
   }));
 
+  const grantLocation = async () => {
+    setLocating(true);
+    setLocationError(undefined);
+    try {
+      const permission = await Location.requestForegroundPermissionsAsync();
+      if (permission.status !== Location.PermissionStatus.GRANTED) {
+        setLocation('denied');
+        setLocationError('Location was not allowed. Hamburg city centre stays selected.');
+        return;
+      }
+      const result = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      setLocation('granted', {
+        latitude: result.coords.latitude,
+        longitude: result.coords.longitude,
+      });
+    } catch {
+      setLocationError('We could not read your location. Hamburg city centre stays selected.');
+    } finally {
+      setLocating(false);
+    }
+  };
+
   return (
     <ScrollView
       className="bg-background flex-1"
@@ -104,10 +132,41 @@ export default function PingHomeScreen() {
         <View className="flex-row items-center gap-1.5">
           <MapPin color={BRAND.accent} size={14} />
           <Typography type="body-sm" color="muted">
-            {HOME.label}
+            {locationLabel}
           </Typography>
         </View>
       </View>
+
+      <Surface variant="default" className="border-border gap-4 rounded-3xl border p-4">
+        <View className="flex-row items-start justify-between gap-3">
+          <View className="flex-1 gap-1">
+            <Typography type="body-sm" weight="semibold">
+              {locationLabel}
+            </Typography>
+            <Typography type="body-xs" color="muted">
+              {profile.locationPermission === 'granted'
+                ? 'Only your phone uses this position for nearby ideas and travel estimates.'
+                : 'This is the default. You can only change it by granting your phone’s GPS location.'}
+            </Typography>
+          </View>
+          <MapPin color={BRAND.secondary} size={20} />
+        </View>
+        <Button variant="secondary" size="sm" onPress={grantLocation} isLoading={locating}>
+          <Button.Label>
+            {profile.locationPermission === 'granted' ? 'Refresh GPS location' : 'Use my GPS location'}
+          </Button.Label>
+        </Button>
+        {locationError ? (
+          <Typography type="body-xs" className="text-danger">
+            {locationError}
+          </Typography>
+        ) : null}
+        <RadiusSlider
+          radiusKm={profile.radiusKm}
+          onChange={(km) => updateProfile({ radiusKm: km })}
+          hint={`${nearbyPeople} people with the app are inside this radius right now.`}
+        />
+      </Surface>
 
       <View className="relative items-center justify-center overflow-hidden rounded-[40px] py-5">
         <BubbleField
@@ -218,34 +277,37 @@ export default function PingHomeScreen() {
               key={ping.id}
               ping={ping}
               myName={profile.firstName}
+              showDetails
               onPress={() => router.push(pingRoute(ping))}
             />
           ))}
         </Surface>
       ) : null}
 
-      <Surface variant="default" className="gap-3 rounded-3xl p-4">
-        <RadiusSlider
-          radiusKm={profile.radiusKm}
-          onChange={(km) => updateProfile({ radiusKm: km })}
-          hint={`${nearbyPeople} people with the app are inside this radius right now.`}
-        />
-      </Surface>
-
-      <View className="gap-4 px-1 pt-2">
-        <Heading type="h5">How this works</Heading>
-        {HOW_IT_WORKS.map((step, index) => (
-          <View key={step} className="flex-row gap-3">
-            <View className="bg-accent-soft h-7 w-7 items-center justify-center rounded-full">
-              <Typography type="body-xs" weight="semibold" className="text-accent-soft-foreground">
-                {index + 1}
-              </Typography>
-            </View>
-            <Typography type="body-sm" color="muted" className="flex-1 pt-1">
-              {step}
-            </Typography>
-          </View>
-        ))}
+      <View className="gap-3 px-1 pt-2">
+        <Heading type="h5">What would you like to do?</Heading>
+        <Surface variant="secondary" className="gap-2 rounded-3xl p-4">
+          <Typography type="body-sm" weight="semibold">
+            1 · Find an interesting activity
+          </Typography>
+          <Typography type="body-xs" color="muted">
+            Tap Get me out to see nearby places and things happening today.
+          </Typography>
+          <Button size="sm" onPress={() => router.push('/discover')}>
+            <Button.Label>Get me out</Button.Label>
+          </Button>
+        </Surface>
+        <Surface variant="default" className="border-border gap-2 rounded-3xl border p-4">
+          <Typography type="body-sm" weight="semibold">
+            2 · Join another person’s plan
+          </Typography>
+          <Typography type="body-xs" color="muted">
+            Open Invitations to answer nearby pings and keep up with chats.
+          </Typography>
+          <Button variant="secondary" size="sm" onPress={() => router.push('/invites')}>
+            <Button.Label>Check invitations</Button.Label>
+          </Button>
+        </Surface>
       </View>
     </ScrollView>
   );

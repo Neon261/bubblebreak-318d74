@@ -159,6 +159,7 @@ function buildInboundPing(host: Person, spot: Spot, extras: Person[]): Ping {
     status: 'open',
     myResponse: 'none',
     seen: false,
+    messages: [],
   };
 }
 

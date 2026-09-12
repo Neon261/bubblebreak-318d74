@@ -14,9 +14,10 @@ import { SpotCard } from '@/components/SpotCard';
 import { ReadyPicker } from '@/components/ReadyPicker';
 import { useTicker } from '@/hooks/useTicker';
 import { computeMeetAt, distanceKm, formatClock, travelMinutes } from '@/lib/geo';
-import { HOME } from '@/lib/mockData';
 import { goBackOrReplace } from '@/lib/navigation';
-import { myJoin, participantName, pingSpot, slowestJoin, spotsLeft, spotsTaken } from '@/lib/pings';
+import {
+  currentLocation,
+  myJoin, participantName, pingSpot, slowestJoin, spotsLeft, spotsTaken } from '@/lib/pings';
 import { pushLocalNotification } from '@/lib/notifications';
 import { useAppStore } from '@/lib/store';
 import { BRAND } from '@/lib/theme';
@@ -31,6 +32,7 @@ export default function LivePingScreen() {
   const profile = useAppStore((state) => state.profile);
   const lockPing = useAppStore((state) => state.lockPing);
   const cancelPing = useAppStore((state) => state.cancelPing);
+  const deleteDraft = useAppStore((state) => state.deleteDraft);
   const setMyReady = useAppStore((state) => state.setMyReady);
   const setSpotCount = useAppStore((state) => state.setSpotCount);
 
@@ -68,7 +70,8 @@ export default function LivePingScreen() {
     router.replace({ pathname: '/plan/[id]', params: { id: ping.id } });
   };
 
-  const myTravel = travelMinutes(distanceKm(HOME, spot.location), profile.travelMode);
+  const origin = currentLocation(profile);
+  const myTravel = travelMinutes(distanceKm(origin, spot.location), profile.travelMode);
   const taken = spotsTaken(ping);
   const left = spotsLeft(ping);
   const full = left === 0;
@@ -106,12 +109,12 @@ export default function LivePingScreen() {
 
       <SpotCard
         spot={spot}
-        distanceKm={distanceKm(HOME, spot.location)}
+        distanceKm={distanceKm(origin, spot.location)}
         travelMinutes={myTravel}
         travelMode={profile.travelMode}
       />
 
-      <PingMap home={HOME} spot={spot} radiusKm={ping.radiusKm} joins={ping.joins} height={200} />
+      <PingMap home={origin} spot={spot} radiusKm={ping.radiusKm} height={200} />
 
       <Surface variant="default" className="gap-4 rounded-3xl p-4">
         <GroupSizePicker
@@ -175,8 +178,17 @@ export default function LivePingScreen() {
                 : 'Send the plan to everyone'}
           </Button.Label>
         </Button>
-        <Button variant="danger-soft" onPress={() => cancelPing(ping.id)}>
-          <Button.Label>Call it off</Button.Label>
+        <Button
+          variant="danger-soft"
+          onPress={() => {
+            if (taken === 0) {
+              if (deleteDraft(ping.id)) goBackOrReplace('/(tabs)');
+            } else if (cancelPing(ping.id)) {
+              goBackOrReplace('/(tabs)/plans');
+            }
+          }}
+        >
+          <Button.Label>{taken === 0 ? 'Delete draft plan' : 'Cancel invitation'}</Button.Label>
         </Button>
       </View>
     </ScrollView>
