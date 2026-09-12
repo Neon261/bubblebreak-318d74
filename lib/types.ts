@@ -54,7 +54,7 @@ export interface Spot {
 export interface Person {
   id: string;
   name: string;
-  /** Their own generated one-liner. */
+  /** Their own intro, written in the first person like yours. */
   bio: string;
   colorClass: string;
   interests: Interest[];

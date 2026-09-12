@@ -88,15 +88,15 @@ export default function OnboardingQuestionsScreen() {
         {answers[category.id]?.customText ? (
           <Button onPress={submitTyped} isDisabled={!hasIntroAnswer(answers[category.id])}>
             <Button.Label>
-              {hasAllIntroAnswers(answers) ? 'See my sentence' : 'Next topic'}
+              {hasAllIntroAnswers(answers) ? 'See my intro' : 'Next topic'}
             </Button.Label>
           </Button>
         ) : null}
 
         <Typography type="body-xs" color="muted">
           {firstName}, one question per topic, drawn at random. Do not like one? Swap it for another
-          from the same topic, or write your own answer. All five become a single sentence — nothing
-          else about you is shown.
+          from the same topic, or write your own answer. All five turn into a short intro in your
+          own voice — nothing else about you is shown.
         </Typography>
       </ScrollView>
     </KeyboardAvoidingView>

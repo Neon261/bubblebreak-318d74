@@ -4,7 +4,7 @@ export interface IntroOption {
   id: string;
   /** What the person taps. */
   label: string;
-  /** Third-person fragment slotted into the sentence templates. */
+  /** First-person fragment slotted into the sentence templates. */
   fragment: string;
 }
 
@@ -42,12 +42,16 @@ export interface IntroCategory {
  * Five groups, one question each, drawn at random from that group's pool.
  * Switching a question keeps you inside the same group.
  *
- * Fragment grammar per group:
- * - doing: noun phrase ("free food")
- * - personality: third-person verb phrase ("asks three questions too many")
- * - funfact: third-person verb phrase ("has never finished a crossword")
+ * The intro reads as a self-introduction, so every fragment is written in the
+ * first person. Fragment grammar per group:
+ * - doing: noun phrase ("free food") — follows "I'd leave the house for …"
+ * - personality: verb phrase that follows "I" ("ask three questions too many")
+ * - funfact: verb phrase that follows "I" ("have never finished a crossword")
  * - hobby: gerund phrase ("rebuilding the same playlist every week")
- * - signature: third-person verb phrase ("closes down the dance floor")
+ * - signature: verb phrase that follows "I" ("close down the dance floor")
+ *
+ * No copulas ("am the loud one") — they read stiff after "I", so those answers
+ * are phrased with a plain verb instead ("get called the loud one").
  */
 export const INTRO_CATEGORIES: IntroCategory[] = [
   {
@@ -87,7 +91,7 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'table',
             label: 'A long table dinner with people I have never met',
-            fragment: "a long table of people they've never met",
+            fragment: "a long table of people I've never met",
           },
           {
             id: 'walk',
@@ -124,7 +128,7 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'bookshop',
             label: 'A bookshop I get lost in',
-            fragment: 'a bookshop they get lost in',
+            fragment: 'a bookshop I can get lost in',
           },
           {
             id: 'swim',
@@ -165,7 +169,7 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
     custom: {
       lead: 'Around new people, I tend to…',
       placeholder: 'ask three questions too many',
-      toFragment: (text) => `tends to ${text}`,
+      toFragment: (text) => `tend to ${text}`,
     },
     questions: [
       {
@@ -176,22 +180,22 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'questions',
             label: 'Ask three questions too many',
-            fragment: 'asks strangers three questions too many',
+            fragment: 'ask three questions too many',
           },
           {
             id: 'listen',
             label: 'Listen and collect their stories',
-            fragment: "listens quietly and collects everyone else's stories",
+            fragment: "listen more than I talk and collect everyone else's stories",
           },
           {
             id: 'overshare',
             label: 'Over-share within five minutes',
-            fragment: 'over-shares within the first five minutes',
+            fragment: 'over-share within the first five minutes',
           },
           {
             id: 'groupchat',
             label: 'Start a group chat before dessert',
-            fragment: 'starts a group chat before dessert',
+            fragment: 'start a group chat before dessert arrives',
           },
         ],
       },
@@ -203,22 +207,22 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'yes',
             label: 'Say yes first, read the details later',
-            fragment: 'says yes first and reads the details later',
+            fragment: 'say yes first and read the details later',
           },
           {
             id: 'early',
             label: 'Turn up ten minutes early, always',
-            fragment: 'turns up ten minutes early, every single time',
+            fragment: 'turn up ten minutes early, every single time',
           },
           {
             id: 'maybe',
             label: 'Keep one foot out of the door',
-            fragment: 'keeps one foot out of the door until the last minute',
+            fragment: 'keep one foot out of the door until the last minute',
           },
           {
             id: 'organise',
             label: 'End up organising everyone',
-            fragment: 'quietly ends up organising everyone',
+            fragment: 'end up quietly organising everyone',
           },
         ],
       },
@@ -230,22 +234,22 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'calm',
             label: 'The calm one, until there is karaoke',
-            fragment: 'is the calm one until karaoke starts',
+            fragment: 'stay the calm one right up until karaoke starts',
           },
           {
             id: 'loud',
             label: 'The loud one who means well',
-            fragment: 'is the loud one who always means well',
+            fragment: 'get called the loud one who means well',
           },
           {
             id: 'notices',
             label: 'The one who notices when someone goes quiet',
-            fragment: 'notices the second someone goes quiet',
+            fragment: 'notice the second someone goes quiet',
           },
           {
             id: 'opinion',
             label: 'The one with an opinion about everything',
-            fragment: 'has a strong opinion about very small things',
+            fragment: 'hold strong opinions about very small things',
           },
         ],
       },
@@ -257,22 +261,22 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'talk',
             label: 'Talking for forty minutes straight',
-            fragment: 'keeps a conversation going for forty minutes straight',
+            fragment: 'keep a conversation going for forty minutes straight',
           },
           {
             id: 'edge',
             label: 'At the edge, making one very good joke',
-            fragment: 'sits at the edge and lands one very good joke',
+            fragment: 'sit at the edge and land one very good joke',
           },
           {
             id: 'adopt',
             label: 'Adopting whoever came alone',
-            fragment: 'adopts whoever turned up on their own',
+            fragment: 'adopt whoever turned up on their own',
           },
           {
             id: 'orders',
             label: "Taking everyone else's drink order",
-            fragment: "remembers everyone's drink order without asking twice",
+            fragment: "remember everyone's drink order without asking twice",
           },
         ],
       },
@@ -285,7 +289,7 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
     custom: {
       lead: 'Fun fact: I…',
       placeholder: 'have never finished a crossword',
-      toFragment: (text) => `swears they ${text}`,
+      toFragment: (text) => text,
     },
     questions: [
       {
@@ -296,7 +300,7 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'dogs',
             label: "I remember every dog's name",
-            fragment: 'remembers every dog in the neighbourhood by name',
+            fragment: 'remember every dog in the neighbourhood by name',
           },
           {
             id: 'park',
@@ -306,7 +310,7 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'whistle',
             label: 'I still cannot whistle',
-            fragment: 'still cannot whistle, still tries',
+            fragment: 'still cannot whistle, and still try',
           },
           {
             id: 'songs',
@@ -323,17 +327,17 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'crossword',
             label: 'I have never finished a crossword',
-            fragment: 'has never once finished a crossword',
+            fragment: 'have never once finished a crossword',
           },
           {
             id: 'umbrellas',
             label: 'I own four umbrellas and lose them all',
-            fragment: 'owns four umbrellas and loses every one of them',
+            fragment: 'own four umbrellas and lose every one of them',
           },
           {
             id: 'reread',
             label: 'I have read the same book five times',
-            fragment: 'has read the same book five times on purpose',
+            fragment: 'have read the same book five times on purpose',
           },
           {
             id: 'podcast',
@@ -377,12 +381,12 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'eggs',
             label: 'My scrambled eggs',
-            fragment: 'makes the best scrambled eggs of anyone they know',
+            fragment: 'make the best scrambled eggs of anyone I know',
           },
           {
             id: 'golf',
             label: 'Never losing at mini golf',
-            fragment: 'has never lost a game of mini golf',
+            fragment: 'have never lost a game of mini golf',
           },
           {
             id: 'sleep',
@@ -392,7 +396,7 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'directions',
             label: 'Giving better directions than a map app',
-            fragment: 'gives better directions than any map app',
+            fragment: 'give better directions than any map app',
           },
         ],
       },
@@ -485,7 +489,7 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'records',
             label: 'Records I cannot play yet',
-            fragment: 'collecting records they cannot play yet',
+            fragment: 'collecting records I cannot play yet',
           },
         ],
       },
@@ -525,7 +529,7 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
     custom: {
       lead: 'A good night out and I…',
       placeholder: 'close down the dance floor',
-      toFragment: (text) => `will ${text}`,
+      toFragment: (text) => text,
     },
     questions: [
       {
@@ -536,22 +540,22 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'dance',
             label: 'Last one off the dance floor',
-            fragment: 'closes down the dance floor',
+            fragment: 'close down the dance floor',
           },
           {
             id: 'kebab',
             label: 'At the late-night kebab place',
-            fragment: 'ends up at the late-night kebab place',
+            fragment: 'end up at the late-night kebab place',
           },
           {
             id: 'early',
             label: 'Home by half ten, no regrets',
-            fragment: 'is home by half ten with zero regrets',
+            fragment: 'get home by half ten with zero regrets',
           },
           {
             id: 'films',
             label: 'Arguing about films at a bus stop',
-            fragment: 'argues about films at a bus stop',
+            fragment: 'argue about films at a bus stop',
           },
         ],
       },
@@ -563,22 +567,22 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'numbers',
             label: 'With two new phone numbers',
-            fragment: 'leaves with two new phone numbers',
+            fragment: 'leave with two new phone numbers',
           },
           {
             id: 'ghost',
             label: 'Without saying goodbye to anyone',
-            fragment: 'vanishes without saying goodbye to anyone',
+            fragment: 'vanish without saying goodbye to anyone',
           },
           {
             id: 'dishes',
             label: 'Last one helping with the dishes',
-            fragment: 'is the last one helping with the dishes',
+            fragment: 'stay to the end and help with the dishes',
           },
           {
             id: 'announce',
             label: 'Announcing I am leaving, then staying an hour',
-            fragment: 'announces they are leaving and then stays an hour',
+            fragment: 'announce that I am leaving and then stay another hour',
           },
         ],
       },
@@ -590,22 +594,22 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'photo',
             label: 'Send a photo nobody remembers taking',
-            fragment: 'sends round a photo nobody remembers taking',
+            fragment: 'send round a photo nobody remembers taking',
           },
           {
             id: 'walk',
             label: 'Go for a walk before everyone wakes up',
-            fragment: 'is out walking before anyone else wakes up',
+            fragment: 'go out walking before anyone else wakes up',
           },
           {
             id: 'breakfast',
             label: 'Make breakfast for whoever is around',
-            fragment: 'makes breakfast for whoever is still around',
+            fragment: 'make breakfast for whoever is still around',
           },
           {
             id: 'recap',
             label: 'Text the group chat a full recap',
-            fragment: 'texts the group chat a full recap',
+            fragment: 'text the group chat a full recap',
           },
         ],
       },
@@ -617,22 +621,22 @@ export const INTRO_CATEGORIES: IntroCategory[] = [
           {
             id: 'table',
             label: 'They always find the good table',
-            fragment: 'always finds the one good table',
+            fragment: 'find the one good table',
           },
           {
             id: 'quick',
             label: 'A quick drink turns into a whole evening',
-            fragment: 'turns a quick drink into a whole evening',
+            fragment: 'turn a quick drink into a whole evening',
           },
           {
             id: 'open',
             label: 'They know somewhere that is still open',
-            fragment: 'knows a place that is open, whatever the hour',
+            fragment: 'know a place that is open, whatever the hour',
           },
           {
             id: 'home',
             label: 'They get everyone home safely',
-            fragment: 'gets everyone home safely, then carries on',
+            fragment: 'get everyone home safely, then carry on',
           },
         ],
       },
@@ -646,18 +650,27 @@ export const INTRO_CATEGORY_IDS: IntroCategoryId[] = INTRO_CATEGORIES.map(
 
 export const INTRO_CATEGORY_COUNT = INTRO_CATEGORIES.length;
 
-/** Templates use all five fragments; a shuffle just moves to the next one. */
-const TEMPLATES: ((parts: Record<IntroCategoryId, string>, name: string) => string)[] = [
-  (parts, name) =>
-    `${name} would cross town for ${parts.doing}, ${parts.personality}, and ${parts.signature} — the rest of the week goes on ${parts.hobby}, and yes, ${parts.funfact}.`,
-  (parts, name) =>
-    `${name}, who ${parts.personality} and ${parts.funfact}, shows up for ${parts.doing}, disappears into ${parts.hobby}, and ${parts.signature}.`,
-  (parts, name) =>
-    `${name} runs on ${parts.doing}, spends far too long on ${parts.hobby}, ${parts.personality}, and ${parts.signature} — fun fact, ${parts.funfact}.`,
-  (parts, name) =>
-    `Somewhere between ${parts.hobby} and ${parts.doing}: ${name} ${parts.personality}, ${parts.signature}, and ${parts.funfact}.`,
-  (parts, name) =>
-    `${name} is the kind of person who ${parts.personality}, turns up for ${parts.doing}, gets weirdly deep into ${parts.hobby}, and ${parts.signature} — also, ${parts.funfact}.`,
+function capitalise(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/**
+ * A self-introduction in two or three short sentences. Every template uses all
+ * five answers, wrapped in phrasing that carries the sentence, so the result
+ * reads like something a person wrote rather than five answers glued together.
+ * A shuffle moves to the next template.
+ */
+const TEMPLATES: ((parts: Record<IntroCategoryId, string>) => string)[] = [
+  (parts) =>
+    `Say ${parts.doing} and I'm out the door. Around new people I ${parts.personality}, and nine times out of ten I ${parts.signature}. My spare hours go into ${parts.hobby} — and fun fact, I ${parts.funfact}.`,
+  (parts) =>
+    `I'd rearrange a whole evening for ${parts.doing}. With people I've just met I ${parts.personality}, and sooner or later I ${parts.signature}. When nobody needs me you'll find me ${parts.hobby}, and for the record, I ${parts.funfact}.`,
+  (parts) =>
+    `Most weeks I'm ${parts.hobby}, but I'd drop all of it for ${parts.doing}. I ${parts.personality}, and true to form I ${parts.signature}. Fun fact: I ${parts.funfact}.`,
+  (parts) =>
+    `${capitalise(parts.doing)}? I'm already on my way. I ${parts.personality}, and by the end of it I ${parts.signature}. The rest of my time goes on ${parts.hobby} — and yes, I ${parts.funfact}.`,
+  (parts) =>
+    `I ${parts.personality}, which is probably the fastest way to get to know me. Give me ${parts.doing} and I'll clear the evening, then nine times out of ten I ${parts.signature}. I spend far too long ${parts.hobby}, and somehow I ${parts.funfact}.`,
 ];
 
 export const INTRO_TEMPLATE_COUNT = TEMPLATES.length;
@@ -879,17 +892,11 @@ function hasEveryFragment(
 }
 
 /**
- * Builds the single funny line shown to other people. Returns an empty string
- * until the name and all five answers exist.
+ * Builds the self-introduction other people read. Written in the first person,
+ * so it never uses the name it sits under. Returns an empty string until all
+ * five answers exist.
  */
-export function buildIntroSentence(
-  firstName: string,
-  answers: IntroAnswers,
-  variant: number,
-): string {
-  const name = firstName.trim();
-  if (!name) return '';
-
+export function buildIntroSentence(answers: IntroAnswers, variant: number): string {
   const parts: Partial<Record<IntroCategoryId, string>> = {};
   for (const id of INTRO_CATEGORY_IDS) {
     const fragment = introFragment(id, answers[id]);
@@ -899,5 +906,5 @@ export function buildIntroSentence(
   if (!hasEveryFragment(parts)) return '';
 
   const template = TEMPLATES[((variant % TEMPLATES.length) + TEMPLATES.length) % TEMPLATES.length];
-  return template ? template(parts, name) : '';
+  return template ? template(parts) : '';
 }

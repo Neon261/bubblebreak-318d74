@@ -40,12 +40,13 @@ const DEFAULT_PROFILE: Profile = {
 };
 
 /**
- * Keeps the shown sentence in step with the name and the answers behind it.
- * A half-finished set of answers leaves the last good sentence in place, so
- * switching a question in the editor does not blank the profile.
+ * Keeps the shown intro in step with the answers behind it. It is written in
+ * the first person, so the name is not part of it. A half-finished set of
+ * answers leaves the last good version in place, so switching a question in
+ * the editor does not blank the profile.
  */
 function withIntro(profile: Profile): Profile {
-  const intro = buildIntroSentence(profile.firstName, profile.introAnswers, profile.introVariant);
+  const intro = buildIntroSentence(profile.introAnswers, profile.introVariant);
   return { ...profile, intro: intro || profile.intro };
 }
 

@@ -178,7 +178,7 @@ function AppStack() {
         <Stack.Screen name="ping/[id]" options={{ title: 'Your ping' }} />
         <Stack.Screen name="invite/[id]" options={{ title: 'Invitation' }} />
         <Stack.Screen name="plan/[id]" options={{ title: 'The plan' }} />
-        <Stack.Screen name="intro" options={{ title: 'Your one-liner' }} />
+        <Stack.Screen name="intro" options={{ title: 'Your intro' }} />
         <Stack.Screen name="+not-found" />
       </Stack.Protected>
 

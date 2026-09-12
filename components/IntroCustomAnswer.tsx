@@ -52,7 +52,7 @@ export function IntroCustomAnswer({
 
       {fragment ? (
         <Typography type="body-xs" color="muted">
-          In your sentence: {fragment}
+          In your intro: {fragment}
         </Typography>
       ) : null}
     </View>

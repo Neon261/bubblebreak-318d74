@@ -310,7 +310,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-yara',
     name: 'Yara',
-    bio: 'Night-shift nurse, learning bass badly',
+    bio: "I work nights at the hospital, and I'm learning bass badly.",
     colorClass: 'bg-berry',
     interests: ['music', 'food'],
     location: offset(0.7, 0.4),
@@ -320,7 +320,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-tomas',
     name: 'Tomás',
-    bio: 'Bakes too much bread, gives it away',
+    bio: 'I bake far too much bread and give most of it away.',
     colorClass: 'bg-sun',
     interests: ['food', 'talks'],
     location: offset(-0.9, 0.8),
@@ -330,7 +330,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-aicha',
     name: 'Aïcha',
-    bio: 'Roofer by day, quiz menace by night',
+    bio: "I fix roofs all day, then I'm a menace at pub quizzes.",
     colorClass: 'bg-grape',
     interests: ['games', 'sports'],
     location: offset(1.6, -0.7),
@@ -340,7 +340,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-bo',
     name: 'Bo',
-    bio: 'Runs slow on purpose, talks fast',
+    bio: 'I run slowly on purpose so I can keep talking the whole way.',
     colorClass: 'bg-moss',
     interests: ['sports', 'outdoors'],
     location: offset(-1.8, 1.1),
@@ -350,7 +350,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-ingrid',
     name: 'Ingrid',
-    bio: 'Retired electrician, fixes anything',
+    bio: 'I was an electrician for thirty years, so I can still fix anything.',
     colorClass: 'bg-clay',
     interests: ['talks', 'art'],
     location: offset(-0.4, -1.6),
@@ -360,7 +360,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-malik',
     name: 'Malik',
-    bio: 'Drives a tram, collects vinyl',
+    bio: 'I drive a tram, and I spend the wages on vinyl.',
     colorClass: 'bg-sky',
     interests: ['music', 'talks'],
     location: offset(2.4, 1.9),
@@ -370,7 +370,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-sena',
     name: 'Sena',
-    bio: 'Studies bees, dances salsa worse',
+    bio: 'I study bees for a living and dance salsa much worse than that.',
     colorClass: 'bg-berry',
     interests: ['dance', 'outdoors'],
     location: offset(1.1, 2.2),
@@ -380,7 +380,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-paulo',
     name: 'Paulo',
-    bio: 'Chef on his day off, will still cook',
+    bio: "I cook in a kitchen all week, and I'll still cook on my day off.",
     colorClass: 'bg-sun',
     interests: ['food', 'games'],
     location: offset(-2.6, -1.2),
@@ -390,7 +390,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-nour',
     name: 'Nour',
-    bio: 'Translator, four languages, one bike',
+    bio: 'I translate in four languages and get everywhere on one old bike.',
     colorClass: 'bg-grape',
     interests: ['talks', 'art'],
     location: offset(3.1, -0.9),
@@ -400,7 +400,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-kai',
     name: 'Kai',
-    bio: 'Apprentice carpenter, terrible at chess',
+    bio: "I'm training as a carpenter, and I lose at chess every single week.",
     colorClass: 'bg-moss',
     interests: ['games', 'sports'],
     location: offset(-3.4, 2.1),
@@ -410,7 +410,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-reva',
     name: 'Reva',
-    bio: 'Midwife, sings in a choir of strangers',
+    bio: 'I deliver babies for work and sing in a choir full of strangers.',
     colorClass: 'bg-sky',
     interests: ['music', 'talks'],
     location: offset(2.8, -3.4),
@@ -420,7 +420,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-fabi',
     name: 'Fabi',
-    bio: 'Bike courier, knows every shortcut',
+    bio: 'I ride courier all day, so I know every shortcut in this city.',
     colorClass: 'bg-clay',
     interests: ['sports', 'outdoors', 'food'],
     location: offset(-4.2, 1.4),
@@ -430,7 +430,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-hana',
     name: 'Hana',
-    bio: 'Sound engineer, hears everything',
+    bio: 'I mix sound for bands, which means I hear absolutely everything.',
     colorClass: 'bg-berry',
     interests: ['music', 'art'],
     location: offset(4.6, 1.2),
@@ -440,7 +440,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-dmitri',
     name: 'Dmitri',
-    bio: 'Taxi driver, tells the good version',
+    bio: 'I drive a taxi, and I always tell the good version of the story.',
     colorClass: 'bg-sun',
     interests: ['talks', 'games'],
     location: offset(-5.1, -2.6),
@@ -450,7 +450,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-lea',
     name: 'Lea',
-    bio: 'Vet nurse, climbs on Tuesdays',
+    bio: "I look after other people's animals, and I climb on Tuesdays.",
     colorClass: 'bg-grape',
     interests: ['sports', 'food'],
     location: offset(5.8, 2.9),
@@ -460,7 +460,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-jonas',
     name: 'Jonas',
-    bio: 'Postman, draws the routes he walks',
+    bio: 'I deliver the post, then I go home and draw the routes I walked.',
     colorClass: 'bg-moss',
     interests: ['art', 'outdoors'],
     location: offset(-6.4, 3.8),
@@ -470,7 +470,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-mira',
     name: 'Mira',
-    bio: 'Gardener, brings snacks to everything',
+    bio: 'I garden for a living, and I bring snacks to absolutely everything.',
     colorClass: 'bg-sky',
     interests: ['outdoors', 'food', 'dance'],
     location: offset(7.2, -4.5),
@@ -480,7 +480,7 @@ export const PEOPLE: Person[] = [
   {
     id: 'p-otto',
     name: 'Otto',
-    bio: 'Plays accordion at bus stops',
+    bio: 'I play the accordion at bus stops, mostly for my own amusement.',
     colorClass: 'bg-clay',
     interests: ['music', 'talks'],
     location: offset(-8.1, -2.2),

@@ -52,8 +52,8 @@ export default function OnboardingNameScreen() {
           </Typography>
           <Typography type="h2">What should people call you?</Typography>
           <Typography type="body-sm" color="muted">
-            Your first name is all we ask for. No photo, no age, no life story — the app writes one
-            sentence about you from a few quick questions instead.
+            Your first name is all we ask for. No photo, no age, no life story — a few quick
+            questions turn into a short intro written in your own voice instead.
           </Typography>
         </View>
 

@@ -32,9 +32,10 @@ export default function OnboardingSentenceScreen() {
       />
 
       <View className="gap-2">
-        <Typography type="h2">Here you are, in one line</Typography>
+        <Typography type="h2">This is how you introduce yourself</Typography>
         <Typography type="body-sm" color="muted">
-          This is the only thing other people read about you. No photo, no age, nothing to scroll.
+          Written in your own voice from your five answers. It is the only thing other people read
+          about you — no photo, no age, nothing to scroll.
         </Typography>
       </View>
 
@@ -42,17 +43,19 @@ export default function OnboardingSentenceScreen() {
         <View className="flex-row items-center gap-2">
           <Sparkles color={accent} size={16} />
           <Typography type="body-xs" color="muted" className="tracking-widest uppercase">
-            Your one-liner
+            Your intro
           </Typography>
         </View>
         <Animated.View key={intro} entering={FadeIn.duration(240)}>
-          <Typography type="h5">{intro}</Typography>
+          <Typography type="body" className="leading-relaxed">
+            {intro}
+          </Typography>
         </Animated.View>
       </Surface>
 
       <Typography type="body-xs" color="muted">
-        Written on your phone from your five answers. Change the wording as often as you like — you
-        can also redo the questions later from your profile.
+        Put together on your phone, so nothing you typed leaves it. Try other wordings as often as
+        you like — you can also redo the questions later from your profile.
       </Typography>
 
       <View className="grow" />

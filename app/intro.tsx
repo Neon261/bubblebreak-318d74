@@ -38,11 +38,13 @@ export default function IntroEditorScreen() {
             </Typography>
           </View>
           <Animated.View key={intro} entering={FadeIn.duration(240)}>
-            <Typography type="h5">{intro}</Typography>
+            <Typography type="body" className="leading-relaxed">
+              {intro}
+            </Typography>
           </Animated.View>
           {complete ? null : (
             <Typography type="body-xs" color="muted">
-              You swapped a question — pick or type an answer below and the sentence updates.
+              You swapped a question — pick or type an answer below and your intro updates.
             </Typography>
           )}
           <Button variant="tertiary" onPress={shuffleIntro}>
