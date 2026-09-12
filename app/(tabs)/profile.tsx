@@ -20,6 +20,7 @@ import {
   Gamepad2,
   HandHeart,
   HeartPulse,
+  LogOut,
   MessagesSquare,
   MoonStar,
   Music2,
@@ -35,6 +36,7 @@ import { BubbleField } from '@/components/BubbleField';
 import { Heading } from '@/components/Heading';
 import { PersonAvatar } from '@/components/PersonAvatar';
 import { VerifiedBadge } from '@/components/VerifiedBadge';
+import { bilt } from '@/lib/bilt';
 import { ALL_INTERESTS, INTEREST_LABELS } from '@/lib/mockData';
 import { currentLocationLabel } from '@/lib/pings';
 import { useAppStore } from '@/lib/store';
@@ -64,14 +66,27 @@ export default function ProfileScreen() {
   const updateProfile = useAppStore((state) => state.updateProfile);
   const setFirstName = useAppStore((state) => state.setFirstName);
   const shuffleIntro = useAppStore((state) => state.shuffleIntro);
-  const deleteAccount = useAppStore((state) => state.deleteAccount);
+  const resetForLogout = useAppStore((state) => state.resetForLogout);
 
   const [nameDraft, setNameDraft] = useState(profile.firstName);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState<string>();
 
-  const confirmDeleteAccount = () => {
-    setIsDeleteDialogOpen(false);
-    deleteAccount();
+  const confirmLogout = async () => {
+    setIsLoggingOut(true);
+    setLogoutError(undefined);
+
+    const { error } = await bilt.auth.signOut();
+    if (error) {
+      setIsLoggingOut(false);
+      setLogoutError('We could not log you out. Please check your connection and try again.');
+      return;
+    }
+
+    resetForLogout();
+    setIsLogoutDialogOpen(false);
+    setIsLoggingOut(false);
     router.replace('/onboarding');
   };
 
@@ -230,17 +245,20 @@ export default function ProfileScreen() {
 
         <Surface variant="default" className="gap-3 rounded-3xl p-4">
           <View className="gap-1">
-            <Typography type="body-sm" weight="medium">
-              Start over
-            </Typography>
+            <View className="flex-row items-center gap-2">
+              <LogOut color={BRAND.accent} size={18} />
+              <Typography type="body-sm" weight="medium">
+                Log out
+              </Typography>
+            </View>
             <Typography type="body-xs" color="muted">
-              Delete your profile, answers, invitations, and plans from this device.
+              End your session and clear your profile and activity from this device.
             </Typography>
           </View>
-          <Dialog isOpen={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <Dialog isOpen={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
             <Dialog.Trigger asChild>
-              <Button variant="danger-soft">
-                <Button.Label>Delete account</Button.Label>
+              <Button variant="tertiary">
+                <Button.Label>Log out</Button.Label>
               </Button>
             </Dialog.Trigger>
             <Dialog.Portal>
@@ -248,18 +266,33 @@ export default function ProfileScreen() {
               <Dialog.Content>
                 <Dialog.Close variant="ghost" />
                 <View className="mb-5 gap-1.5 pr-8">
-                  <Dialog.Title>Delete your account?</Dialog.Title>
+                  <Dialog.Title>Log out?</Dialog.Title>
                   <Dialog.Description>
-                    This removes your profile and all activity from this device. You will return to
-                    registration and cannot undo this.
+                    Your local profile, invitations, and plans will be cleared from this device. You
+                    will return to registration.
                   </Dialog.Description>
+                  {logoutError ? (
+                    <Typography type="body-xs" className="text-danger">
+                      {logoutError}
+                    </Typography>
+                  ) : null}
                 </View>
                 <View className="flex-row justify-end gap-3">
-                  <Button variant="ghost" size="sm" onPress={() => setIsDeleteDialogOpen(false)}>
-                    <Button.Label>Keep account</Button.Label>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    isDisabled={isLoggingOut}
+                    onPress={() => setIsLogoutDialogOpen(false)}
+                  >
+                    <Button.Label>Stay logged in</Button.Label>
                   </Button>
-                  <Button variant="danger" size="sm" onPress={confirmDeleteAccount}>
-                    <Button.Label>Delete account</Button.Label>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    isDisabled={isLoggingOut}
+                    onPress={() => void confirmLogout()}
+                  >
+                    <Button.Label>{isLoggingOut ? 'Logging out…' : 'Log out'}</Button.Label>
                   </Button>
                 </View>
               </Dialog.Content>

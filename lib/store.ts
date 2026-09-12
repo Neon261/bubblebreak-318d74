@@ -99,8 +99,8 @@ export interface AppState {
   markVerified: (reference: string) => void;
   /** Verification passed and the person is in. */
   completeRegistration: () => void;
-  /** Deletes the local account and all session plans, returning to registration. */
-  deleteAccount: () => void;
+  /** Clears device-local profile and session plans after signing out. */
+  resetForLogout: () => void;
   createPing: (spotId: string, radiusKm: number, spotsForOthers: number) => string;
   addInboundPing: (ping: Ping) => void;
   /** First come, first in: returns false when the spots are already gone. */
@@ -252,7 +252,7 @@ export const useAppStore = create<AppState>()(
       completeRegistration: () =>
         set((state) => ({ profile: { ...state.profile, registeredAt: Date.now() } })),
 
-      deleteAccount: () =>
+      resetForLogout: () =>
         set({
           profile: freshProfile(),
           pings: {},
