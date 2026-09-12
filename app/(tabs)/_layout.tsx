@@ -1,22 +1,14 @@
 import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useThemeColor } from 'heroui-native';
 import { CalendarCheck, Compass, Inbox, UserRound } from 'lucide-react-native';
 import { useUniwind } from 'uniwind';
 
 import { useAppStore } from '@/lib/store';
+import { BRAND } from '@/lib/theme';
 import { ME } from '@/lib/types';
 
 export default function TabLayout() {
   const { theme } = useUniwind();
-  const [background, foreground, border, accent, muted, accentForeground] = useThemeColor([
-    'background',
-    'foreground',
-    'border',
-    'accent',
-    'muted',
-    'accent-foreground',
-  ]);
 
   const unanswered = useAppStore((state) =>
     state.pingIds.reduce((count, id) => {
@@ -33,17 +25,18 @@ export default function TabLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          sceneStyle: { backgroundColor: background },
-          headerStyle: { backgroundColor: background },
-          headerTintColor: foreground,
+          sceneStyle: { backgroundColor: BRAND.paper },
+          headerStyle: { backgroundColor: BRAND.paper },
+          headerTintColor: BRAND.ink,
           headerShadowVisible: false,
           tabBarStyle: {
-            backgroundColor: background,
-            borderTopColor: border,
+            backgroundColor: BRAND.paper,
+            borderTopColor: BRAND.border,
           },
-          tabBarActiveTintColor: accent,
-          tabBarInactiveTintColor: muted,
-          tabBarBadgeStyle: { backgroundColor: accent, color: accentForeground },
+          tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+          tabBarActiveTintColor: BRAND.accent,
+          tabBarInactiveTintColor: BRAND.muted,
+          tabBarBadgeStyle: { backgroundColor: BRAND.accent, color: '#ffffff' },
         }}
       >
         <Tabs.Screen

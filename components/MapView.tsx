@@ -222,7 +222,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
         style={[
           {
             alignItems: 'center',
-            backgroundColor: '#f8fafc',
+            backgroundColor: '#fdf4e8',
             justifyContent: 'center',
             padding: 24,
           },
@@ -232,7 +232,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
       >
         <Text
           style={{
-            color: '#0f172a',
+            color: '#2f1d2d',
             fontSize: 16,
             fontWeight: '700',
             marginBottom: 8,
@@ -241,7 +241,7 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
         >
           Map unavailable in this runtime
         </Text>
-        <Text style={{ color: '#64748b', fontSize: 13, lineHeight: 18, textAlign: 'center' }}>
+        <Text style={{ color: '#857682', fontSize: 13, lineHeight: 18, textAlign: 'center' }}>
           This screen needs the native react-native-maps view. Use a development build or a runtime
           that includes it.
         </Text>

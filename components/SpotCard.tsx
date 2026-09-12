@@ -1,9 +1,11 @@
-import { PressableFeedback, Surface, Typography, useThemeColor } from 'heroui-native';
+import { PressableFeedback, Surface, Typography } from 'heroui-native';
 import { Clock, MapPin, UtensilsCrossed } from 'lucide-react-native';
 import { Image, View } from 'react-native';
 
+import { Heading } from '@/components/Heading';
 import { formatDistance, travelModeLabel } from '@/lib/geo';
 import { CATEGORY_VISUALS, categoryLabel, foodLine, timeLine } from '@/lib/spotVisuals';
+import { BRAND } from '@/lib/theme';
 import type { Spot, TravelMode } from '@/lib/types';
 
 interface SpotCardProps {
@@ -17,7 +19,6 @@ interface SpotCardProps {
 const PHOTO_HEIGHT = 150;
 
 export function SpotCard({ spot, distanceKm, travelMinutes, travelMode, onPress }: SpotCardProps) {
-  const [muted] = useThemeColor(['muted']);
   const visual = CATEGORY_VISUALS[spot.category];
   const Icon = visual.icon;
   const food = foodLine(spot);
@@ -38,7 +39,7 @@ export function SpotCard({ spot, distanceKm, travelMinutes, travelMode, onPress 
             style={{ backgroundColor: 'rgba(255, 255, 255, 0.93)' }}
           >
             <Icon color={visual.pinColor} size={13} />
-            <Typography type="body-xs" weight="semibold" style={{ color: '#1f2937' }}>
+            <Typography type="body-xs" weight="semibold" style={{ color: BRAND.ink }}>
               {categoryLabel(spot)}
             </Typography>
           </View>
@@ -46,7 +47,7 @@ export function SpotCard({ spot, distanceKm, travelMinutes, travelMode, onPress 
           {spot.kind === 'event' ? (
             <View
               className="rounded-full px-2.5 py-1"
-              style={{ backgroundColor: 'rgba(20, 119, 107, 0.94)' }}
+              style={{ backgroundColor: 'rgba(34, 139, 145, 0.94)' }}
             >
               <Typography type="body-xs" weight="semibold" style={{ color: '#ffffff' }}>
                 Happening today
@@ -58,9 +59,7 @@ export function SpotCard({ spot, distanceKm, travelMinutes, travelMode, onPress 
 
       <View className="gap-3 p-4">
         <View className="gap-1">
-          <Typography type="body" weight="semibold">
-            {spot.name}
-          </Typography>
+          <Heading type="h5">{spot.name}</Heading>
           <Typography type="body-sm" color="muted">
             {spot.tagline}
           </Typography>
@@ -68,7 +67,7 @@ export function SpotCard({ spot, distanceKm, travelMinutes, travelMode, onPress 
 
         <View className="flex-row flex-wrap items-center gap-x-4 gap-y-1">
           <View className="flex-row items-center gap-1.5">
-            <MapPin color={muted} size={14} />
+            <MapPin color={BRAND.muted} size={14} />
             <Typography type="body-xs" color="muted">
               {formatDistance(distanceKm)}
               {travelMinutes !== undefined
@@ -77,14 +76,14 @@ export function SpotCard({ spot, distanceKm, travelMinutes, travelMode, onPress 
             </Typography>
           </View>
           <View className="flex-row items-center gap-1.5">
-            <Clock color={muted} size={14} />
+            <Clock color={BRAND.muted} size={14} />
             <Typography type="body-xs" color="muted">
               {timeLine(spot)}
             </Typography>
           </View>
           {food ? (
             <View className="flex-row items-center gap-1.5">
-              <UtensilsCrossed color={muted} size={14} />
+              <UtensilsCrossed color={BRAND.muted} size={14} />
               <Typography type="body-xs" color="muted">
                 {food}
               </Typography>

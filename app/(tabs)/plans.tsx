@@ -5,6 +5,8 @@ import { CalendarCheck } from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
 
 import { EmptyState } from '@/components/EmptyState';
+import { BubbleField } from '@/components/BubbleField';
+import { Heading } from '@/components/Heading';
 import { PingSummaryCard } from '@/components/PingSummaryCard';
 import { useTicker } from '@/hooks/useTicker';
 import { isOver, isSettled, isWaiting, myJoin, pingList, pingRoute } from '@/lib/pings';
@@ -35,7 +37,7 @@ export default function PlansScreen() {
 
   const renderGroup = (label: string, list: Ping[]) => (
     <View key={label} className="gap-3">
-      <Typography type="body-xs" color="muted">
+      <Typography type="body-xs" color="muted" weight="semibold" className="tracking-widest">
         {label.toUpperCase()}
       </Typography>
       {list.map((ping) => (
@@ -55,9 +57,10 @@ export default function PlansScreen() {
       contentContainerClassName="gap-5 px-5 pb-12 pt-safe-offset-4"
       showsVerticalScrollIndicator={false}
     >
-      <View className="gap-1">
-        <Typography type="h2">Plans</Typography>
-        <Typography type="body-sm" color="muted">
+      <View className="relative gap-1 overflow-hidden pb-1">
+        <BubbleField preset="header" animate={false} />
+        <Heading type="h2">Plans</Heading>
+        <Typography type="body-sm" color="muted" className="max-w-80">
           Everything you said yes to, and everything you started.
         </Typography>
       </View>

@@ -43,70 +43,70 @@ export const CATEGORY_VISUALS: Record<SpotCategory, CategoryVisual> = {
     icon: Coffee,
     label: 'Café',
     bgClass: 'bg-clay-soft',
-    pinColor: '#c98f5a',
+    pinColor: '#b0764a',
     photo: cafePhoto,
   },
   bar: {
     icon: Beer,
     label: 'Bar',
     bgClass: 'bg-sun-soft',
-    pinColor: '#e2a32b',
+    pinColor: '#d99026',
     photo: barPhoto,
   },
   food: {
     icon: UtensilsCrossed,
     label: 'Food',
     bgClass: 'bg-berry-soft',
-    pinColor: '#e0503f',
+    pinColor: '#cf5133',
     photo: foodPhoto,
   },
   music: {
     icon: Music,
     label: 'Music',
     bgClass: 'bg-grape-soft',
-    pinColor: '#9a67cd',
+    pinColor: '#8a63c9',
     photo: musicPhoto,
   },
   sport: {
     icon: Dumbbell,
     label: 'Sport',
     bgClass: 'bg-sky-soft',
-    pinColor: '#3d8fdc',
+    pinColor: '#2f7fb5',
     photo: sportPhoto,
   },
   outdoors: {
     icon: Trees,
     label: 'Outdoors',
     bgClass: 'bg-moss-soft',
-    pinColor: '#46a86a',
+    pinColor: '#3f9a72',
     photo: outdoorsPhoto,
   },
   culture: {
     icon: Palette,
     label: 'Culture',
     bgClass: 'bg-grape-soft',
-    pinColor: '#6248c8',
+    pinColor: '#6f4fb8',
     photo: culturePhoto,
   },
   games: {
     icon: Dices,
     label: 'Games',
     bgClass: 'bg-sky-soft',
-    pinColor: '#23a8b8',
+    pinColor: '#1f9aa3',
     photo: gamesPhoto,
   },
   market: {
     icon: ShoppingBasket,
     label: 'Market',
     bgClass: 'bg-sun-soft',
-    pinColor: '#b8397a',
+    pinColor: '#c0447e',
     photo: marketPhoto,
   },
   craft: {
     icon: Hammer,
     label: 'Craft',
     bgClass: 'bg-clay-soft',
-    pinColor: '#7a8c3a',
+    pinColor: '#7e8b3f',
     photo: craftPhoto,
   },
 };
@@ -118,7 +118,7 @@ export const PRICE_LABELS: Record<'free' | 'cheap' | 'mid', string> = {
 };
 
 /** Your own pin on the discover map. */
-export const HOME_PIN_COLOR = '#14776b';
+export const HOME_PIN_COLOR = '#146a70';
 
 /** What to put on the category chip: events read as their category too. */
 export function categoryLabel(spot: Spot): string {

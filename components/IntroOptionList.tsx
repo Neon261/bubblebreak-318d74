@@ -1,9 +1,10 @@
-import { Typography, useThemeColor } from 'heroui-native';
+import { Typography } from 'heroui-native';
 import { Check } from 'lucide-react-native';
 import { View } from 'react-native';
 import { PressableFeedback } from 'heroui-native';
 
 import type { IntroQuestion } from '@/lib/introSentence';
+import { BRAND } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 
 interface IntroOptionListProps {
@@ -14,8 +15,6 @@ interface IntroOptionListProps {
 
 /** Tappable answer rows, shared by registration and the later edit screen. */
 export function IntroOptionList({ question, selectedId, onSelect }: IntroOptionListProps) {
-  const [accent] = useThemeColor(['accent']);
-
   return (
     <View className="gap-2.5">
       {question.options.map((option) => {
@@ -37,7 +36,7 @@ export function IntroOptionList({ question, selectedId, onSelect }: IntroOptionL
               <Typography type="body-sm" className="flex-1" weight={selected ? 'medium' : 'normal'}>
                 {option.label}
               </Typography>
-              {selected ? <Check color={accent} size={18} /> : null}
+              {selected ? <Check color={BRAND.accent} size={18} /> : null}
             </View>
           </PressableFeedback>
         );

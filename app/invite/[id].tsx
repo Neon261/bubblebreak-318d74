@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Button, Surface, Typography, useThemeColor } from 'heroui-native';
+import { Button, Surface, Typography } from 'heroui-native';
 import { Inbox, Users } from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
 
+import { BubbleField } from '@/components/BubbleField';
 import { EmptyState } from '@/components/EmptyState';
 import { JoinerRow } from '@/components/JoinerRow';
 import { PersonAvatar } from '@/components/PersonAvatar';
@@ -25,13 +26,13 @@ import { goBackOrReplace } from '@/lib/navigation';
 import { hostName, pingSpot, spotsLeft } from '@/lib/pings';
 import { scheduleHostPlan } from '@/lib/simulation';
 import { useAppStore } from '@/lib/store';
+import { BRAND } from '@/lib/theme';
 import type { ReadyMinutes } from '@/lib/types';
 
 export default function InviteScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const now = useTicker(1000);
-  const [accent] = useThemeColor(['accent']);
 
   const pingId = id ?? '';
   const ping = useAppStore((state) => state.pings[pingId]);
@@ -97,7 +98,11 @@ export default function InviteScreen() {
       contentContainerClassName="gap-4 px-5 pb-12 pt-4"
       showsVerticalScrollIndicator={false}
     >
-      <Surface variant="secondary" className="flex-row items-center gap-3 rounded-3xl p-4">
+      <Surface
+        variant="secondary"
+        className="relative flex-row items-center gap-3 overflow-hidden rounded-3xl p-4"
+      >
+        <BubbleField preset="soft" animate={false} />
         <PersonAvatar
           name={hostName(ping, profile.firstName)}
           colorClass={host?.colorClass ?? 'bg-sky'}
@@ -131,7 +136,7 @@ export default function InviteScreen() {
 
       <Surface variant="default" className="gap-1 rounded-3xl p-4">
         <View className="flex-row items-center gap-2 pb-1">
-          <Users color={accent} size={16} />
+          <Users color={BRAND.accent} size={16} />
           <Typography type="body-sm" weight="semibold">
             Already in · {ping.joins.length} of {ping.spotsForOthers + 1}
           </Typography>

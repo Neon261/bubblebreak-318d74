@@ -1,9 +1,11 @@
-import { Button, Surface, Typography, useThemeColor } from 'heroui-native';
+import { Button, Surface, Typography } from 'heroui-native';
 import { MapPin } from 'lucide-react-native';
 import { Image, View } from 'react-native';
 
+import { Heading } from '@/components/Heading';
 import { formatDistance } from '@/lib/geo';
 import { CATEGORY_VISUALS, categoryLabel, foodLine, timeLine } from '@/lib/spotVisuals';
+import { BRAND } from '@/lib/theme';
 import type { Spot } from '@/lib/types';
 
 interface SpotPreviewCardProps {
@@ -22,7 +24,6 @@ export function SpotPreviewCard({
   travelMinutes,
   onChoose,
 }: SpotPreviewCardProps) {
-  const [muted] = useThemeColor(['muted']);
   const visual = CATEGORY_VISUALS[spot.category];
   const Icon = visual.icon;
   const food = foodLine(spot);
@@ -50,15 +51,13 @@ export function SpotPreviewCard({
             ) : null}
           </View>
 
-          <Typography type="body-sm" weight="semibold">
-            {spot.name}
-          </Typography>
+          <Heading type="h5">{spot.name}</Heading>
           <Typography type="body-xs" color="muted" numberOfLines={2}>
             {spot.tagline}
           </Typography>
 
           <View className="flex-row items-center gap-1.5 pt-0.5">
-            <MapPin color={muted} size={12} />
+            <MapPin color={BRAND.muted} size={12} />
             <Typography type="body-xs" color="muted" numberOfLines={1}>
               {formatDistance(distanceKm)} · {travelMinutes} min · {food ?? timeLine(spot)}
             </Typography>

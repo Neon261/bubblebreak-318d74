@@ -1,4 +1,4 @@
-import { PressableFeedback, Typography, useThemeColor } from 'heroui-native';
+import { PressableFeedback, Typography } from 'heroui-native';
 import { PencilLine, Shuffle } from 'lucide-react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -6,7 +6,9 @@ import Animated, { FadeInRight } from 'react-native-reanimated';
 
 import { IntroCustomAnswer } from '@/components/IntroCustomAnswer';
 import { IntroOptionList } from '@/components/IntroOptionList';
+import { Heading } from '@/components/Heading';
 import { cleanCustomText, type IntroCategory, type IntroQuestion } from '@/lib/introSentence';
+import { BRAND } from '@/lib/theme';
 
 interface IntroQuestionCardProps {
   category: IntroCategory;
@@ -43,7 +45,6 @@ export function IntroQuestionCard({
   step,
   compact = false,
 }: IntroQuestionCardProps) {
-  const [accent, muted] = useThemeColor(['accent', 'muted']);
   const [writing, setWriting] = useState(false);
 
   const typed = cleanCustomText(customText).length > 0;
@@ -78,9 +79,7 @@ export function IntroQuestionCard({
       </View>
 
       <View className="gap-1">
-        <Typography type={compact ? 'body' : 'h3'} weight={compact ? 'semibold' : 'normal'}>
-          {question.prompt}
-        </Typography>
+        <Heading type={compact ? 'h5' : 'h3'}>{question.prompt}</Heading>
         <Typography type="body-xs" color="muted">
           {question.helper}
         </Typography>
@@ -119,7 +118,7 @@ export function IntroQuestionCard({
             accessibilityLabel="None of these fit, write my own answer"
           >
             <View className="border-border bg-surface flex-row items-center gap-3 rounded-2xl border border-dashed px-4 py-3.5">
-              <PencilLine color={accent} size={16} />
+              <PencilLine color={BRAND.accent} size={16} />
               <Typography type="body-sm" className="flex-1">
                 None of these fit — say it your way
               </Typography>
@@ -134,7 +133,7 @@ export function IntroQuestionCard({
           accessibilityHint="Keeps the same topic, swaps the question"
         >
           <View className="border-border flex-row items-center gap-2 self-start rounded-full border px-3.5 py-2">
-            <Shuffle color={accent} size={14} />
+            <Shuffle color={BRAND.accent} size={14} />
             <Typography type="body-xs" weight="medium">
               Ask me something else
             </Typography>
@@ -144,7 +143,7 @@ export function IntroQuestionCard({
 
       {compact ? null : (
         <View className="flex-row items-center gap-2">
-          <Shuffle color={muted} size={12} />
+          <Shuffle color={BRAND.muted} size={12} />
           <Typography type="body-xs" color="muted" className="flex-1">
             {category.about}
           </Typography>

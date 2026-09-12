@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Button, Spinner, Surface, Typography, useThemeColor } from 'heroui-native';
+import { Button, Spinner, Surface, Typography } from 'heroui-native';
 import { CalendarX, Clock, MapPin, Users } from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
 
+import { BubbleField } from '@/components/BubbleField';
 import { EmptyState } from '@/components/EmptyState';
+import { Heading } from '@/components/Heading';
 import { JoinerRow } from '@/components/JoinerRow';
 import { PingMap } from '@/components/PingMap';
 import { useTicker } from '@/hooks/useTicker';
@@ -20,12 +22,12 @@ import {
   slowestJoin,
 } from '@/lib/pings';
 import { useAppStore } from '@/lib/store';
+import { BRAND } from '@/lib/theme';
 
 export default function PlanScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const now = useTicker(1000);
-  const [accent, muted] = useThemeColor(['accent', 'muted']);
 
   const pingId = id ?? '';
   const ping = useAppStore((state) => state.pings[pingId]);
@@ -100,13 +102,26 @@ export default function PlanScreen() {
       ) : null}
 
       {ping.meetAt ? (
-        <Surface variant="default" className="bg-accent-soft gap-2 rounded-3xl p-5">
-          <Typography type="body-xs" className="text-accent-soft-foreground">
-            MEET AT
+        <Surface
+          variant="default"
+          className="bg-accent-soft relative gap-2 overflow-hidden rounded-3xl p-5"
+        >
+          <BubbleField
+            bubbles={[
+              { size: 120, top: -46, right: -30, tint: 'apricot', opacity: 0.55 },
+              { size: 44, bottom: -14, right: 54, tint: 'lilac', hollow: true, opacity: 0.5 },
+              { size: 16, top: 26, right: 96, tint: 'teal', opacity: 0.6 },
+            ]}
+          />
+          <Typography
+            type="body-xs"
+            className="text-accent-soft-foreground tracking-widest uppercase"
+          >
+            Meet at
           </Typography>
-          <Typography type="h1" className="text-accent-soft-foreground">
+          <Heading type="h1" className="text-accent-soft-foreground">
             {formatClock(ping.meetAt)}
-          </Typography>
+          </Heading>
           <Typography type="body-sm" className="text-accent-soft-foreground">
             {ping.meetAt > now
               ? `In ${formatCountdown(ping.meetAt - now)}`
@@ -118,7 +133,7 @@ export default function PlanScreen() {
 
       <Surface variant="default" className="gap-3 rounded-3xl p-4">
         <View className="flex-row items-start gap-2">
-          <MapPin color={accent} size={18} />
+          <MapPin color={BRAND.accent} size={18} />
           <View className="flex-1 gap-0.5">
             <Typography type="body" weight="semibold">
               {spot.name}
@@ -142,7 +157,7 @@ export default function PlanScreen() {
 
       <Surface variant="default" className="gap-1 rounded-3xl p-4">
         <View className="flex-row items-center gap-2 pb-1">
-          <Users color={accent} size={16} />
+          <Users color={BRAND.accent} size={16} />
           <Typography type="body-sm" weight="semibold">
             {sortedJoins.length} coming
           </Typography>
@@ -167,7 +182,7 @@ export default function PlanScreen() {
       {ping.meetAt && slowest ? (
         <Surface variant="secondary" className="gap-2 rounded-3xl p-4">
           <View className="flex-row items-center gap-2">
-            <Clock color={muted} size={16} />
+            <Clock color={BRAND.muted} size={16} />
             <Typography type="body-sm" weight="semibold">
               Why this time
             </Typography>

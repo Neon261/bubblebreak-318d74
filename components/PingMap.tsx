@@ -16,9 +16,9 @@ interface PingMapProps {
 }
 
 const MARKER_COLORS = {
-  home: '#2f9e8c',
-  spot: '#e07a3f',
-  joiner: '#8a63d2',
+  home: '#146a70',
+  spot: '#c34b2e',
+  joiner: '#9b7fc4',
 } as const;
 
 export function PingMap({ home, spot, radiusKm, joins = [], height = 200 }: PingMapProps) {
@@ -60,9 +60,9 @@ export function PingMap({ home, spot, radiusKm, joins = [], height = 200 }: Ping
               id: 'radius',
               center: home,
               radius: radiusKm * 1000,
-              strokeColor: 'rgba(47, 158, 140, 0.55)',
+              strokeColor: 'rgba(195, 75, 46, 0.5)',
               strokeWidth: 2,
-              fillColor: 'rgba(47, 158, 140, 0.12)',
+              fillColor: 'rgba(195, 75, 46, 0.1)',
             },
           ]
         : [],

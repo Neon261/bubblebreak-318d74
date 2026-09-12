@@ -1,17 +1,19 @@
 import { Redirect, useRouter } from 'expo-router';
-import { Button, Surface, Typography, useThemeColor } from 'heroui-native';
+import { Button, Surface, Typography } from 'heroui-native';
 import { RefreshCw, Sparkles } from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { OnboardingProgress } from '@/components/OnboardingProgress';
+import { BubbleField } from '@/components/BubbleField';
+import { Heading } from '@/components/Heading';
 import { hasAllIntroAnswers } from '@/lib/introSentence';
 import { goBackOrReplace } from '@/lib/navigation';
 import { useAppStore } from '@/lib/store';
+import { BRAND } from '@/lib/theme';
 
 export default function OnboardingSentenceScreen() {
   const router = useRouter();
-  const [accent] = useThemeColor(['accent']);
   const intro = useAppStore((state) => state.profile.intro);
   const answers = useAppStore((state) => state.profile.introAnswers);
   const shuffleIntro = useAppStore((state) => state.shuffleIntro);
@@ -31,17 +33,19 @@ export default function OnboardingSentenceScreen() {
         onBack={() => goBackOrReplace('/onboarding/questions')}
       />
 
-      <View className="gap-2">
-        <Typography type="h2">This is how you introduce yourself</Typography>
+      <View className="relative gap-2 overflow-hidden">
+        <BubbleField preset="header" />
+        <Heading type="h2">This is how you introduce yourself</Heading>
         <Typography type="body-sm" color="muted">
           Written in your own voice from your five answers. It is the only thing other people read
           about you — no photo, no age, nothing to scroll.
         </Typography>
       </View>
 
-      <Surface variant="secondary" className="gap-3 rounded-3xl p-5">
+      <Surface variant="secondary" className="relative gap-3 overflow-hidden rounded-3xl p-5">
+        <BubbleField preset="rise" />
         <View className="flex-row items-center gap-2">
-          <Sparkles color={accent} size={16} />
+          <Sparkles color={BRAND.accent} size={16} />
           <Typography type="body-xs" color="muted" className="tracking-widest uppercase">
             Your intro
           </Typography>
@@ -64,7 +68,7 @@ export default function OnboardingSentenceScreen() {
         <Button variant="tertiary" onPress={shuffleIntro}>
           <Button.Label>
             <View className="flex-row items-center gap-2">
-              <RefreshCw color={accent} size={16} />
+              <RefreshCw color={BRAND.accent} size={16} />
               <Typography type="body-sm" weight="medium">
                 Try another wording
               </Typography>

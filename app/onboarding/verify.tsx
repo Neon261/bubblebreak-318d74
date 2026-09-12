@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button, Spinner, Surface, Typography, useThemeColor } from 'heroui-native';
+import { Button, Spinner, Surface, Typography } from 'heroui-native';
 import { Check, ShieldCheck } from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { OnboardingProgress } from '@/components/OnboardingProgress';
+import { BubbleField } from '@/components/BubbleField';
+import { Heading } from '@/components/Heading';
 import { goBackOrReplace } from '@/lib/navigation';
 import { useAppStore } from '@/lib/store';
+import { BRAND } from '@/lib/theme';
 import { runVerification, VERIFY_PROVIDER, VERIFY_STEPS } from '@/lib/verification';
 
 const PROMISES = [
@@ -16,7 +19,6 @@ const PROMISES = [
 ];
 
 export default function OnboardingVerifyScreen() {
-  const [accent, success] = useThemeColor(['accent', 'success']);
   const status = useAppStore((state) => state.profile.verification.status);
   const reference = useAppStore((state) => state.profile.verification.reference);
   const markVerified = useAppStore((state) => state.markVerified);
@@ -55,8 +57,9 @@ export default function OnboardingVerifyScreen() {
         onBack={running || verified ? undefined : () => goBackOrReplace('/onboarding/sentence')}
       />
 
-      <View className="gap-2">
-        <Typography type="h2">Prove you&apos;re a real person</Typography>
+      <View className="relative gap-2 overflow-hidden">
+        <BubbleField preset="header" />
+        <Heading type="h2">Prove you&apos;re a real person</Heading>
         <Typography type="body-sm" color="muted">
           Strangers are about to meet you somewhere within a few kilometres. Everyone here passes an
           identity check with {VERIFY_PROVIDER}, an outside provider, before they can use the app.
@@ -66,7 +69,7 @@ export default function OnboardingVerifyScreen() {
       <Surface variant="default" className="gap-3 rounded-3xl p-4">
         {PROMISES.map((line) => (
           <View key={line} className="flex-row gap-3">
-            <Check color={accent} size={16} />
+            <Check color={BRAND.accent} size={16} />
             <Typography type="body-sm" color="muted" className="flex-1">
               {line}
             </Typography>
@@ -82,7 +85,7 @@ export default function OnboardingVerifyScreen() {
             return (
               <View key={label} className="h-6 flex-row items-center gap-3">
                 <View className="h-5 w-5 items-center justify-center">
-                  {done ? <Check color={success} size={16} /> : null}
+                  {done ? <Check color={BRAND.success} size={16} /> : null}
                   {active ? <Spinner size="sm" /> : null}
                 </View>
                 <Typography type="body-sm" color={done || active ? 'default' : 'muted'}>
@@ -96,10 +99,11 @@ export default function OnboardingVerifyScreen() {
 
       {verified ? (
         <Animated.View entering={FadeIn.duration(240)}>
-          <Surface variant="secondary" className="gap-2 rounded-3xl p-5">
+          <Surface variant="secondary" className="relative gap-2 overflow-hidden rounded-3xl p-5">
+            <BubbleField preset="rise" />
             <View className="flex-row items-center gap-2">
-              <ShieldCheck color={success} size={20} />
-              <Typography type="h5">You&apos;re verified</Typography>
+              <ShieldCheck color={BRAND.success} size={20} />
+              <Heading type="h5">You&apos;re verified</Heading>
             </View>
             <Typography type="body-sm" color="muted">
               {VERIFY_PROVIDER} confirmed you are a real person. Reference {reference}.

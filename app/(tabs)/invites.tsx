@@ -5,6 +5,8 @@ import { Inbox } from 'lucide-react-native';
 import { FlatList, View } from 'react-native';
 
 import { EmptyState } from '@/components/EmptyState';
+import { BubbleField } from '@/components/BubbleField';
+import { Heading } from '@/components/Heading';
 import { PingSummaryCard } from '@/components/PingSummaryCard';
 import { isHostedByMe, needsMyAnswer, pingList, pingRoute } from '@/lib/pings';
 import { useAppStore } from '@/lib/store';
@@ -48,9 +50,10 @@ export default function InvitesScreen() {
       contentContainerClassName="gap-3 px-5 pb-12 pt-safe-offset-4"
       showsVerticalScrollIndicator={false}
       ListHeaderComponent={
-        <View className="gap-1 pb-2">
-          <Typography type="h2">Invites</Typography>
-          <Typography type="body-sm" color="muted">
+        <View className="relative gap-1 overflow-hidden pb-3">
+          <BubbleField preset="header" animate={false} />
+          <Heading type="h2">Invites</Heading>
+          <Typography type="body-sm" color="muted" className="max-w-80">
             {openToPings
               ? 'People nearby you have never met, heading somewhere.'
               : 'You are invisible right now — turn pings back on in the You tab.'}
@@ -68,7 +71,12 @@ export default function InvitesScreen() {
       }
       renderItem={({ item }) =>
         item.kind === 'header' ? (
-          <Typography type="body-xs" color="muted" className="pt-2">
+          <Typography
+            type="body-xs"
+            color="muted"
+            weight="semibold"
+            className="pt-3 tracking-widest"
+          >
             {item.label?.toUpperCase()}
           </Typography>
         ) : item.ping ? (

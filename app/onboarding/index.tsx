@@ -12,6 +12,8 @@ import {
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 
 import { OnboardingProgress } from '@/components/OnboardingProgress';
+import { BubbleField } from '@/components/BubbleField';
+import { Heading, Wordmark } from '@/components/Heading';
 import { useAppStore } from '@/lib/store';
 
 const MIN_NAME_LENGTH = 2;
@@ -46,11 +48,10 @@ export default function OnboardingNameScreen() {
       >
         <OnboardingProgress step={1} total={4} />
 
-        <View className="gap-2">
-          <Typography type="body-xs" color="muted" className="tracking-widest uppercase">
-            BubbleBreak
-          </Typography>
-          <Typography type="h2">What should people call you?</Typography>
+        <View className="relative gap-2 overflow-hidden">
+          <BubbleField preset="header" />
+          <Wordmark size="sm" />
+          <Heading type="h2">What should people call you?</Heading>
           <Typography type="body-sm" color="muted">
             Your first name is all we ask for. No photo, no age, no life story — a few quick
             questions turn into a short intro written in your own voice instead.

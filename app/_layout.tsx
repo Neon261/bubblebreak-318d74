@@ -9,11 +9,12 @@ import {
   Inter_700Bold,
   useFonts,
 } from '@expo-google-fonts/inter';
+import { Fraunces_600SemiBold, Fraunces_700Bold } from '@expo-google-fonts/fraunces';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
 import { useEffect } from 'react';
 import * as DevClient from 'expo-dev-client';
-import { HeroUINativeProvider, useThemeColor } from 'heroui-native';
+import { HeroUINativeProvider } from 'heroui-native';
 import { Uniwind } from 'uniwind';
 import {
   ErrorBoundary as ExpoErrorBoundary,
@@ -29,6 +30,7 @@ import { InstallPrompt } from '@/components/InstallPrompt';
 import { useSession } from '@/hooks/useSession';
 import { useStoreHydrated } from '@/hooks/useStoreHydrated';
 import { useAppStore } from '@/lib/store';
+import { BRAND } from '@/lib/theme';
 
 /**
  * Custom ErrorBoundary that reports React render errors to the parent window (Bilt preview iframe)
@@ -61,6 +63,8 @@ export default function RootLayout() {
     Inter_500Medium,
     Inter_600SemiBold,
     Inter_700Bold,
+    Fraunces_600SemiBold,
+    Fraunces_700Bold,
   });
   const hydrated = useStoreHydrated();
 
@@ -101,16 +105,14 @@ export default function RootLayout() {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href =
-          'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
+          'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap';
         link.crossOrigin = 'anonymous';
         document.head.appendChild(link);
       }
 
-      // Note: The @import in global.css and the link tag above ensure Inter font loads
-      // expo-font will register the font family names (Inter_400Regular, etc.)
-      // If expo-font fails due to proxy issues, the fonts should still be available
-      // via the direct Google Fonts CDN link, though the specific font family names
-      // might not be registered. The app should still render with Inter font.
+      // Note: The @import in global.css and the link tag above ensure Inter and
+      // Fraunces load. expo-font registers the exact family names used by the
+      // font-* utilities (Inter_400Regular, Fraunces_600SemiBold, ...).
     }
   }, []);
 
@@ -157,19 +159,18 @@ export default function RootLayout() {
 }
 
 function AppStack() {
-  const [background, foreground] = useThemeColor(['background', 'foreground']);
   const registered = useAppStore((state) => state.profile.registeredAt !== undefined);
   useSession();
 
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: background },
-        headerTintColor: foreground,
-        headerTitleStyle: { color: foreground },
+        headerStyle: { backgroundColor: BRAND.paper },
+        headerTintColor: BRAND.accent,
+        headerTitleStyle: { color: BRAND.ink, fontFamily: 'Fraunces_600SemiBold', fontSize: 18 },
         headerShadowVisible: false,
         headerBackTitle: 'Back',
-        contentStyle: { backgroundColor: background },
+        contentStyle: { backgroundColor: BRAND.paper },
       }}
     >
       <Stack.Protected guard={registered}>

@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'expo-router';
-import { Button, Chip, Surface, Typography, useThemeColor } from 'heroui-native';
+import { Button, Chip, Surface, Typography } from 'heroui-native';
 import { List, Map as MapIcon, RefreshCw, SearchX } from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
 
+import { BubbleField } from '@/components/BubbleField';
 import { EmptyState } from '@/components/EmptyState';
 import { GroupSizePicker } from '@/components/GroupSizePicker';
+import { Heading } from '@/components/Heading';
 import { RadiusSlider } from '@/components/RadiusSlider';
 import { SpotCard } from '@/components/SpotCard';
 import { SpotMap } from '@/components/SpotMap';
@@ -15,6 +17,7 @@ import { HOME, SPOTS } from '@/lib/mockData';
 import { clampSpots } from '@/lib/pings';
 import { startPingSimulation } from '@/lib/simulation';
 import { useAppStore } from '@/lib/store';
+import { BRAND } from '@/lib/theme';
 import type { SpotKind } from '@/lib/types';
 
 type Filter = 'all' | SpotKind;
@@ -35,7 +38,6 @@ export default function DiscoverScreen() {
   const [mode, setMode] = useState<ViewMode>('map');
   const [offset, setOffset] = useState(0);
   const [selectedId, setSelectedId] = useState<string>();
-  const [accent, accentForeground] = useThemeColor(['accent', 'accent-foreground']);
 
   const profile = useAppStore((state) => state.profile);
   const updateProfile = useAppStore((state) => state.updateProfile);
@@ -86,9 +88,10 @@ export default function DiscoverScreen() {
       contentContainerClassName="gap-4 px-5 pb-12 pt-4"
       showsVerticalScrollIndicator={false}
     >
-      <View className="gap-1">
-        <Typography type="h3">Pick something</Typography>
-        <Typography type="body-sm" color="muted">
+      <View className="relative gap-1 overflow-hidden pb-1">
+        <BubbleField preset="header" animate={false} />
+        <Heading type="h3">Pick something</Heading>
+        <Typography type="body-sm" color="muted" className="max-w-80">
           {canRotate
             ? `${shown.length} of ${items.length} ideas within ${profile.radiusKm} km.`
             : `${items.length} ideas within ${profile.radiusKm} km.`}{' '}
@@ -119,7 +122,7 @@ export default function DiscoverScreen() {
             color={mode === 'map' ? 'accent' : 'default'}
             onPress={() => setMode('map')}
           >
-            <MapIcon color={mode === 'map' ? accentForeground : accent} size={13} />
+            <MapIcon color={mode === 'map' ? '#ffffff' : BRAND.accent} size={13} />
             <Chip.Label>Map</Chip.Label>
           </Chip>
           <Chip
@@ -127,14 +130,14 @@ export default function DiscoverScreen() {
             color={mode === 'list' ? 'accent' : 'default'}
             onPress={() => setMode('list')}
           >
-            <List color={mode === 'list' ? accentForeground : accent} size={13} />
+            <List color={mode === 'list' ? '#ffffff' : BRAND.accent} size={13} />
             <Chip.Label>List</Chip.Label>
           </Chip>
         </View>
 
         {canRotate ? (
           <Button variant="tertiary" size="sm" onPress={rotate}>
-            <RefreshCw color={accent} size={15} />
+            <RefreshCw color={BRAND.accent} size={15} />
             <Button.Label>Five others</Button.Label>
           </Button>
         ) : null}

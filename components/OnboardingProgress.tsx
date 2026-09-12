@@ -1,7 +1,8 @@
-import { PressableFeedback, Typography, useThemeColor } from 'heroui-native';
+import { PressableFeedback, Typography } from 'heroui-native';
 import { ChevronLeft } from 'lucide-react-native';
 import { View } from 'react-native';
 
+import { BRAND } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 
 interface OnboardingProgressProps {
@@ -13,14 +14,12 @@ interface OnboardingProgressProps {
 
 /** Back control plus step dots for the registration flow. */
 export function OnboardingProgress({ step, total, onBack }: OnboardingProgressProps) {
-  const [foreground] = useThemeColor(['foreground']);
-
   return (
     <View className="h-9 flex-row items-center gap-3">
       {onBack ? (
         <PressableFeedback onPress={onBack} accessibilityRole="button" accessibilityLabel="Go back">
           <View className="border-border h-9 w-9 items-center justify-center rounded-full border">
-            <ChevronLeft color={foreground} size={18} />
+            <ChevronLeft color={BRAND.ink} size={18} />
           </View>
         </PressableFeedback>
       ) : null}

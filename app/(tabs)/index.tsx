@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useRouter } from 'expo-router';
-import { Button, PressableFeedback, Surface, Typography, useThemeColor } from 'heroui-native';
+import { Button, PressableFeedback, Surface, Typography } from 'heroui-native';
 import { BellRing, MapPin, Radar, Users } from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
 import Animated, {
@@ -14,6 +14,8 @@ import Animated, {
 import { useEffect } from 'react';
 
 import { PingSummaryCard } from '@/components/PingSummaryCard';
+import { BubbleField } from '@/components/BubbleField';
+import { Heading, Wordmark } from '@/components/Heading';
 import { RadiusSlider } from '@/components/RadiusSlider';
 import { useTicker } from '@/hooks/useTicker';
 import { distanceKm, formatClock, formatCountdown } from '@/lib/geo';
@@ -29,6 +31,7 @@ import {
   spotsTaken,
 } from '@/lib/pings';
 import { peopleInRadius, useAppStore } from '@/lib/store';
+import { BRAND } from '@/lib/theme';
 
 const HOW_IT_WORKS = [
   'Press the button — five places and events inside your radius, rotate for five more.',
@@ -56,7 +59,6 @@ function usePulse(durationMs: number): SharedValue<number> {
 export default function PingHomeScreen() {
   const router = useRouter();
   const now = useTicker(1000);
-  const [accent, accentForeground] = useThemeColor(['accent', 'accent-foreground']);
 
   const profile = useAppStore((state) => state.profile);
   const updateProfile = useAppStore((state) => state.updateProfile);
@@ -93,20 +95,46 @@ export default function PingHomeScreen() {
       contentContainerClassName="gap-6 px-5 pb-12 pt-safe-offset-4"
       showsVerticalScrollIndicator={false}
     >
-      <View className="gap-1">
-        <Typography type="body-xs" color="muted" className="tracking-widest uppercase">
-          BubbleBreak
-        </Typography>
-        <Typography type="h2">Out of your bubble</Typography>
+      <View className="relative gap-2 overflow-hidden pb-1">
+        <BubbleField preset="header" />
+        <Wordmark size="sm" />
+        <Heading type="h2" className="max-w-64">
+          Out of your bubble
+        </Heading>
         <View className="flex-row items-center gap-1.5">
-          <MapPin color={accent} size={14} />
+          <MapPin color={BRAND.accent} size={14} />
           <Typography type="body-sm" color="muted">
             {HOME.label}
           </Typography>
         </View>
       </View>
 
-      <View className="items-center justify-center py-2">
+      <View className="relative items-center justify-center overflow-hidden rounded-[40px] py-5">
+        <BubbleField
+          bubbles={[
+            { size: 84, top: 4, left: 2, tint: 'teal', opacity: 0.55, drift: 9, duration: 5000 },
+            {
+              size: 40,
+              bottom: 16,
+              right: 10,
+              tint: 'lilac',
+              hollow: true,
+              opacity: 0.8,
+              drift: 14,
+              duration: 3800,
+              delay: 500,
+            },
+            {
+              size: 16,
+              top: 34,
+              right: 46,
+              tint: 'apricot',
+              drift: 18,
+              duration: 3000,
+              delay: 200,
+            },
+          ]}
+        />
         <Animated.View
           pointerEvents="none"
           style={[
@@ -117,7 +145,7 @@ export default function PingHomeScreen() {
               width: 208,
               borderRadius: 104,
               borderWidth: 2,
-              borderColor: accent,
+              borderColor: BRAND.accent,
             },
           ]}
         />
@@ -127,10 +155,10 @@ export default function PingHomeScreen() {
           accessibilityLabel="Find something happening around me"
         >
           <View className="bg-accent h-52 w-52 items-center justify-center gap-2 rounded-full">
-            <Radar color={accentForeground} size={40} />
-            <Typography type="h4" className="text-accent-foreground">
+            <Radar color="#ffffff" size={40} />
+            <Heading type="h4" className="text-accent-foreground">
               Get me out
-            </Typography>
+            </Heading>
             <Typography type="body-xs" align="center" className="text-accent-foreground px-8">
               {nearbySpots} places within {profile.radiusKm} km
             </Typography>
@@ -141,7 +169,7 @@ export default function PingHomeScreen() {
       {liveHosted ? (
         <Surface variant="default" className="gap-3 rounded-3xl p-4">
           <View className="flex-row items-center gap-2">
-            <Users color={accent} size={16} />
+            <Users color={BRAND.accent} size={16} />
             <Typography type="body-sm" weight="semibold">
               Your ping is live
             </Typography>
@@ -158,13 +186,14 @@ export default function PingHomeScreen() {
       ) : null}
 
       {nextPlan?.meetAt ? (
-        <Surface variant="secondary" className="gap-2 rounded-3xl p-4">
-          <Typography type="body-xs" color="muted">
-            NEXT PLAN
+        <Surface variant="secondary" className="relative gap-2 overflow-hidden rounded-3xl p-4">
+          <BubbleField preset="soft" animate={false} />
+          <Typography type="body-xs" color="muted" className="tracking-widest uppercase">
+            Next plan
           </Typography>
-          <Typography type="h5">
+          <Heading type="h5">
             {pingSpot(nextPlan)?.name} at {formatClock(nextPlan.meetAt)}
-          </Typography>
+          </Heading>
           <Typography type="body-sm" color="muted">
             In {formatCountdown(nextPlan.meetAt - now)} · {nextPlan.joins.length} people
           </Typography>
@@ -177,7 +206,7 @@ export default function PingHomeScreen() {
       {openInvites.length > 0 ? (
         <Surface variant="default" className="border-border gap-3 rounded-3xl border p-4">
           <View className="flex-row items-center gap-2">
-            <BellRing color={accent} size={16} />
+            <BellRing color={BRAND.accent} size={16} />
             <Typography type="body-sm" weight="semibold">
               {openInvites.length === 1
                 ? 'Someone nearby is heading out'
@@ -203,18 +232,16 @@ export default function PingHomeScreen() {
         />
       </Surface>
 
-      <View className="gap-3 px-1">
-        <Typography type="body-sm" weight="semibold">
-          How this works
-        </Typography>
+      <View className="gap-4 px-1 pt-2">
+        <Heading type="h5">How this works</Heading>
         {HOW_IT_WORKS.map((step, index) => (
           <View key={step} className="flex-row gap-3">
-            <View className="bg-accent-soft h-6 w-6 items-center justify-center rounded-full">
-              <Typography type="body-xs" className="text-accent-soft-foreground">
+            <View className="bg-accent-soft h-7 w-7 items-center justify-center rounded-full">
+              <Typography type="body-xs" weight="semibold" className="text-accent-soft-foreground">
                 {index + 1}
               </Typography>
             </View>
-            <Typography type="body-sm" color="muted" className="flex-1">
+            <Typography type="body-sm" color="muted" className="flex-1 pt-1">
               {step}
             </Typography>
           </View>

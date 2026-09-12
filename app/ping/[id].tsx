@@ -1,11 +1,13 @@
 import { useEffect, useMemo } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Button, Spinner, Surface, Typography, useThemeColor } from 'heroui-native';
+import { Button, Spinner, Surface, Typography } from 'heroui-native';
 import { Radio, Users } from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
 
+import { BubbleField } from '@/components/BubbleField';
 import { EmptyState } from '@/components/EmptyState';
 import { GroupSizePicker } from '@/components/GroupSizePicker';
+import { Heading } from '@/components/Heading';
 import { JoinerRow } from '@/components/JoinerRow';
 import { PingMap } from '@/components/PingMap';
 import { SpotCard } from '@/components/SpotCard';
@@ -17,12 +19,12 @@ import { goBackOrReplace } from '@/lib/navigation';
 import { myJoin, participantName, pingSpot, slowestJoin, spotsLeft, spotsTaken } from '@/lib/pings';
 import { pushLocalNotification } from '@/lib/notifications';
 import { useAppStore } from '@/lib/store';
+import { BRAND } from '@/lib/theme';
 
 export default function LivePingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const now = useTicker(1000);
-  const [accent] = useThemeColor(['accent']);
 
   const pingId = id ?? '';
   const ping = useAppStore((state) => state.pings[pingId]);
@@ -77,9 +79,10 @@ export default function LivePingScreen() {
       contentContainerClassName="gap-4 px-5 pb-12 pt-4"
       showsVerticalScrollIndicator={false}
     >
-      <Surface variant="secondary" className="gap-2 rounded-3xl p-4">
+      <Surface variant="secondary" className="relative gap-2 overflow-hidden rounded-3xl p-4">
+        <BubbleField preset="rise" animate={!full} />
         <View className="flex-row items-center gap-2">
-          {full ? <Users color={accent} size={16} /> : <Spinner />}
+          {full ? <Users color={BRAND.accent} size={16} /> : <Spinner />}
           <Typography type="body-sm" weight="semibold">
             {full
               ? `Full — ${taken} ${taken === 1 ? 'person is' : 'people are'} in`
@@ -131,7 +134,7 @@ export default function LivePingScreen() {
 
       <Surface variant="default" className="gap-1 rounded-3xl p-4">
         <View className="flex-row items-center gap-2 pb-1">
-          <Users color={accent} size={16} />
+          <Users color={BRAND.accent} size={16} />
           <Typography type="body-sm" weight="semibold">
             Who is in · {ping.joins.length} of {ping.spotsForOthers + 1}
           </Typography>
@@ -146,11 +149,12 @@ export default function LivePingScreen() {
         ))}
       </Surface>
 
-      <Surface variant="secondary" className="gap-2 rounded-3xl p-4">
-        <Typography type="body-xs" color="muted">
-          IF YOU SEND IT NOW
+      <Surface variant="secondary" className="relative gap-2 overflow-hidden rounded-3xl p-4">
+        <BubbleField preset="soft" animate={false} />
+        <Typography type="body-xs" color="muted" className="tracking-widest uppercase">
+          If you send it now
         </Typography>
-        <Typography type="h4">Meet at {formatClock(previewTime)}</Typography>
+        <Heading type="h4">Meet at {formatClock(previewTime)}</Heading>
         <Typography type="body-sm" color="muted">
           {slowest
             ? `Waits for ${participantName(slowest, profile.firstName)}: ${slowest.readyMinutes} min to get ready plus ${slowest.travelMinutes} min travel.`

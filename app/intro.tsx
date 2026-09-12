@@ -1,16 +1,17 @@
-import { Button, Surface, Typography, useThemeColor } from 'heroui-native';
+import { Button, Surface, Typography } from 'heroui-native';
 import { RefreshCw, Sparkles } from 'lucide-react-native';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
+import { BubbleField } from '@/components/BubbleField';
 import { IntroQuestionCard } from '@/components/IntroQuestionCard';
 import { currentIntroQuestion, hasAllIntroAnswers, INTRO_CATEGORIES } from '@/lib/introSentence';
 import { goBackOrReplace } from '@/lib/navigation';
 import { useAppStore } from '@/lib/store';
+import { BRAND } from '@/lib/theme';
 
 /** Answer the registration questions again, any time, from your profile. */
 export default function IntroEditorScreen() {
-  const [accent] = useThemeColor(['accent']);
   const intro = useAppStore((state) => state.profile.intro);
   const answers = useAppStore((state) => state.profile.introAnswers);
   const setIntroAnswer = useAppStore((state) => state.setIntroAnswer);
@@ -30,9 +31,10 @@ export default function IntroEditorScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Surface variant="secondary" className="gap-3 rounded-3xl p-5">
+        <Surface variant="secondary" className="relative gap-3 overflow-hidden rounded-3xl p-5">
+          <BubbleField preset="rise" />
           <View className="flex-row items-center gap-2">
-            <Sparkles color={accent} size={16} />
+            <Sparkles color={BRAND.accent} size={16} />
             <Typography type="body-xs" color="muted" className="tracking-widest uppercase">
               What people read
             </Typography>
@@ -50,7 +52,7 @@ export default function IntroEditorScreen() {
           <Button variant="tertiary" onPress={shuffleIntro}>
             <Button.Label>
               <View className="flex-row items-center gap-2">
-                <RefreshCw color={accent} size={16} />
+                <RefreshCw color={BRAND.accent} size={16} />
                 <Typography type="body-sm" weight="medium">
                   Try another wording
                 </Typography>

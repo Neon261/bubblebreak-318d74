@@ -1,19 +1,11 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
-import {
-  Button,
-  Chip,
-  Input,
-  Label,
-  Surface,
-  Switch,
-  TextField,
-  Typography,
-  useThemeColor,
-} from 'heroui-native';
+import { Button, Chip, Input, Label, Surface, Switch, TextField, Typography } from 'heroui-native';
 import { RefreshCw, Sparkles } from 'lucide-react-native';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 
+import { BubbleField } from '@/components/BubbleField';
+import { Heading } from '@/components/Heading';
 import { PersonAvatar } from '@/components/PersonAvatar';
 import { GroupSizePicker } from '@/components/GroupSizePicker';
 import { RadiusSlider } from '@/components/RadiusSlider';
@@ -23,11 +15,11 @@ import { TRAVEL_MODES, travelModeLabel } from '@/lib/geo';
 import { ALL_INTERESTS, HOME, INTEREST_LABELS } from '@/lib/mockData';
 import { clampSpots } from '@/lib/pings';
 import { peopleInRadius, useAppStore } from '@/lib/store';
+import { BRAND } from '@/lib/theme';
 import type { Interest } from '@/lib/types';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const [accent] = useThemeColor(['accent']);
   const profile = useAppStore((state) => state.profile);
   const updateProfile = useAppStore((state) => state.updateProfile);
   const setFirstName = useAppStore((state) => state.setFirstName);
@@ -54,10 +46,11 @@ export default function ProfileScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View className="flex-row items-center gap-4">
+        <View className="relative flex-row items-center gap-4 overflow-hidden py-1">
+          <BubbleField preset="header" animate={false} />
           <PersonAvatar name={profile.firstName} colorClass="bg-accent-soft" size="lg" />
           <View className="flex-1 gap-1">
-            <Typography type="h3">{profile.firstName}</Typography>
+            <Heading type="h3">{profile.firstName}</Heading>
             <Typography type="body-sm" color="muted">
               {HOME.label}
             </Typography>
@@ -67,9 +60,10 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <Surface variant="secondary" className="gap-3 rounded-3xl p-4">
+        <Surface variant="secondary" className="relative gap-3 overflow-hidden rounded-3xl p-4">
+          <BubbleField preset="rise" animate={false} />
           <View className="flex-row items-center gap-2">
-            <Sparkles color={accent} size={16} />
+            <Sparkles color={BRAND.accent} size={16} />
             <Typography type="body-xs" color="muted" className="tracking-widest uppercase">
               What people read about you
             </Typography>
@@ -79,7 +73,7 @@ export default function ProfileScreen() {
             <Button variant="tertiary" onPress={shuffleIntro}>
               <Button.Label>
                 <View className="flex-row items-center gap-2">
-                  <RefreshCw color={accent} size={16} />
+                  <RefreshCw color={BRAND.accent} size={16} />
                   <Typography type="body-sm" weight="medium">
                     Try another wording
                   </Typography>

@@ -1,7 +1,8 @@
-import { Typography, useThemeColor } from 'heroui-native';
+import { Typography } from 'heroui-native';
 import { ShieldCheck } from 'lucide-react-native';
 import { View } from 'react-native';
 
+import { BRAND } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 
 interface VerifiedBadgeProps {
@@ -15,8 +16,6 @@ interface VerifiedBadgeProps {
  * tells a stranger the person on the other side is real.
  */
 export function VerifiedBadge({ label, className }: VerifiedBadgeProps) {
-  const [success] = useThemeColor(['success']);
-
   return (
     <View
       className={cn(
@@ -25,7 +24,7 @@ export function VerifiedBadge({ label, className }: VerifiedBadgeProps) {
       )}
       accessibilityLabel={label ?? 'Identity verified'}
     >
-      <ShieldCheck color={success} size={12} />
+      <ShieldCheck color={BRAND.success} size={12} />
       {label ? (
         <Typography type="body-xs" className="text-success-soft-foreground">
           {label}

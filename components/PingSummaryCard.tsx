@@ -1,4 +1,4 @@
-import { PressableFeedback, Surface, Typography, useThemeColor } from 'heroui-native';
+import { PressableFeedback, Surface, Typography } from 'heroui-native';
 import { ChevronRight } from 'lucide-react-native';
 import { View } from 'react-native';
 
@@ -7,6 +7,7 @@ import { formatClock, formatRelative } from '@/lib/geo';
 import { PEOPLE_BY_ID } from '@/lib/mockData';
 import { hostName, isHostedByMe, pingSpot, spotsLeft } from '@/lib/pings';
 import { CATEGORY_VISUALS } from '@/lib/spotVisuals';
+import { BRAND } from '@/lib/theme';
 import type { Ping } from '@/lib/types';
 
 interface PingSummaryCardProps {
@@ -30,7 +31,6 @@ function statusLine(ping: Ping): string {
 }
 
 export function PingSummaryCard({ ping, myName, onPress }: PingSummaryCardProps) {
-  const [muted] = useThemeColor(['muted']);
   const spot = pingSpot(ping);
   const host = hostName(ping, myName);
   const colorClass = isHostedByMe(ping)
@@ -49,14 +49,14 @@ export function PingSummaryCard({ ping, myName, onPress }: PingSummaryCardProps)
             {isHostedByMe(ping) ? 'You' : host} → {spot?.name ?? 'Somewhere nearby'}
           </Typography>
           <View className="flex-row items-center gap-1.5">
-            {Icon ? <Icon color={muted} size={13} /> : null}
+            {Icon ? <Icon color={BRAND.muted} size={13} /> : null}
             <Typography type="body-xs" color="muted" truncate>
               {statusLine(ping)}
             </Typography>
           </View>
         </View>
 
-        <ChevronRight color={muted} size={18} />
+        <ChevronRight color={BRAND.muted} size={18} />
       </Surface>
     </PressableFeedback>
   );

@@ -1,15 +1,14 @@
 import { Stack } from 'expo-router';
-import { useThemeColor } from 'heroui-native';
+
+import { BRAND } from '@/lib/theme';
 
 export default function OnboardingLayout() {
-  const [background] = useThemeColor(['background']);
-
   return (
     <Stack
       screenOptions={{
         headerShown: false,
         gestureEnabled: false,
-        contentStyle: { backgroundColor: background },
+        contentStyle: { backgroundColor: BRAND.paper },
       }}
     />
   );

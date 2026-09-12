@@ -334,23 +334,23 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
             >
               <View
                 style={{
-                  backgroundColor: '#ffffff',
-                  borderColor: 'rgba(15, 23, 42, 0.12)',
-                  borderRadius: 8,
+                  backgroundColor: '#fffcf5',
+                  borderColor: 'rgba(47, 29, 45, 0.12)',
+                  borderRadius: 12,
                   borderWidth: 1,
                   maxWidth: 180,
                   paddingHorizontal: 8,
                   paddingVertical: 6,
-                  boxShadow: '0 10px 20px rgba(15, 23, 42, 0.14)',
+                  boxShadow: '0 10px 20px rgba(47, 29, 45, 0.12)',
                 }}
               >
                 {marker.title ? (
-                  <Text style={{ color: '#0f172a', fontSize: 12, fontWeight: '700' }}>
+                  <Text style={{ color: '#2f1d2d', fontSize: 12, fontWeight: '700' }}>
                     {marker.title}
                   </Text>
                 ) : null}
                 {marker.description ? (
-                  <Text style={{ color: '#64748b', fontSize: 11, marginTop: 2 }}>
+                  <Text style={{ color: '#857682', fontSize: 11, marginTop: 2 }}>
                     {marker.description}
                   </Text>
                 ) : null}
