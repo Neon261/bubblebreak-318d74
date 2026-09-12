@@ -6,7 +6,6 @@ import { ScrollView, View } from 'react-native';
 
 import { BubbleField } from '@/components/BubbleField';
 import { EmptyState } from '@/components/EmptyState';
-import { GroupSizePicker } from '@/components/GroupSizePicker';
 import { Heading } from '@/components/Heading';
 import { RadiusSlider } from '@/components/RadiusSlider';
 import { SpotCard } from '@/components/SpotCard';
@@ -14,8 +13,7 @@ import { SpotMap } from '@/components/SpotMap';
 import { SpotPreviewCard } from '@/components/SpotPreviewCard';
 import { distanceKm, travelMinutes } from '@/lib/geo';
 import { SPOTS } from '@/lib/mockData';
-import { clampSpots, currentLocation } from '@/lib/pings';
-import { startPingSimulation } from '@/lib/simulation';
+import { currentLocation } from '@/lib/pings';
 import { useAppStore } from '@/lib/store';
 import { BRAND } from '@/lib/theme';
 import type { SpotKind } from '@/lib/types';
@@ -38,11 +36,9 @@ export default function DiscoverScreen() {
   const [mode, setMode] = useState<ViewMode>('map');
   const [offset, setOffset] = useState(0);
   const [selectedId, setSelectedId] = useState<string>();
-  const [selectedSpots, setSelectedSpots] = useState<number>();
 
   const profile = useAppStore((state) => state.profile);
   const updateProfile = useAppStore((state) => state.updateProfile);
-  const createPing = useAppStore((state) => state.createPing);
   const origin = currentLocation(profile);
 
   const items = useMemo(
@@ -77,12 +73,8 @@ export default function DiscoverScreen() {
     setSelectedId(undefined);
   };
 
-  const submit = () => {
-    if (!selectedId || selectedSpots === undefined) return;
-
-    const id = createPing(selectedId, profile.radiusKm, clampSpots(selectedSpots));
-    startPingSimulation(id);
-    router.replace({ pathname: '/ping/[id]', params: { id } });
+  const openSpot = (spotId: string) => {
+    router.push({ pathname: '/spot/[id]', params: { id: spotId } });
   };
 
   return (
@@ -176,11 +168,12 @@ export default function DiscoverScreen() {
               spot={selected.spot}
               distanceKm={selected.km}
               travelMinutes={travelMinutes(selected.km, profile.travelMode)}
+              onPress={() => openSpot(selected.spot.id)}
             />
           ) : null}
 
           <Typography type="body-xs" color="muted">
-            Tap a pin to see what it is, or switch to the list for the full details.
+            Tap a pin, then tap the preview to see the details.
           </Typography>
         </View>
       ) : (
@@ -192,31 +185,12 @@ export default function DiscoverScreen() {
               distanceKm={item.km}
               travelMinutes={travelMinutes(item.km, profile.travelMode)}
               travelMode={profile.travelMode}
-              selected={selectedId === item.spot.id}
-              onPress={() => setSelectedId(item.spot.id)}
+              selected={false}
+              onPress={() => openSpot(item.spot.id)}
             />
           ))}
         </View>
       )}
-
-      <Surface variant="default" className="rounded-3xl p-4">
-        <GroupSizePicker
-          value={selectedSpots ?? 0}
-          onChange={(count) => {
-            setSelectedSpots(count);
-            updateProfile({ defaultSpots: count });
-          }}
-          hint={
-            selectedSpots === undefined
-              ? 'Choose how many people can join before submitting.'
-              : `A group of ${selectedSpots + 1} in total. The first ${selectedSpots} ${selectedSpots === 1 ? 'person' : 'people'} to say yes are in, the rest get told the spots went.`
-          }
-        />
-      </Surface>
-
-      <Button size="lg" isDisabled={!selectedId || selectedSpots === undefined} onPress={submit}>
-        <Button.Label>Submit</Button.Label>
-      </Button>
     </ScrollView>
   );
 }

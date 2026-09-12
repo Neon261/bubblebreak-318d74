@@ -58,6 +58,8 @@ export interface SpotSource {
   label: string;
   /** One line on what kind of tips this source is good for. */
   blurb: string;
+  /** Public page where the source publishes Hamburg recommendations. */
+  url?: string;
 }
 
 /** What a plate or a round costs, for places that serve food or drinks. */

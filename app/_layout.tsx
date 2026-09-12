@@ -176,6 +176,7 @@ function AppStack() {
       <Stack.Protected guard={registered}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="discover" options={{ title: 'Around you' }} />
+        <Stack.Screen name="spot/[id]" options={{ title: 'Activity details' }} />
         <Stack.Screen name="ping/[id]" options={{ title: 'Your ping' }} />
         <Stack.Screen name="invite/[id]" options={{ title: 'Invitation' }} />
         <Stack.Screen name="plan/[id]" options={{ title: 'The plan' }} />
