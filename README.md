@@ -14,7 +14,8 @@ A second way to use BubbleBreak is for moments when you do not already have a pl
 - Discovers curated places and time-based events around Hamburg within an adjustable radius.
 - Presents nearby ideas on a map or as a list, grouped by categories such as food, culture, music, sports, and outdoor activities.
 - Lets a host choose an activity and set the number of available participant spots.
-- Sends a simulated local ping and shows interested participants joining over time.
+- Sends a simulated local Ping and shows interested participants joining over time.
+- Lets users discover existing nearby Pings and join other people’s plans when they do not want to create one themselves.
 - Allows participants to choose how much time they need before leaving.
 - Calculates a shared meeting time using each participant’s preparation and travel time.
 - Creates a group plan with destination details, participant status, map information, and chat.
