@@ -169,9 +169,6 @@ export default function PingHomeScreen() {
       <View className="relative gap-2 overflow-hidden pb-1">
         <BubbleField preset="header" />
         <Wordmark size="sm" />
-        <Heading type="h2" className="max-w-64">
-          Out of your bubble
-        </Heading>
       </View>
 
       <Surface variant="default" className="border-border gap-3 rounded-3xl border p-3">
@@ -250,7 +247,7 @@ export default function PingHomeScreen() {
           accessibilityLabel={`Meet someone and reach ${reachablePeople} ${reachablePeople === 1 ? 'person' : 'people'} with notifications on`}
         >
           <View className="bg-accent h-48 w-48 items-center justify-center gap-2 rounded-full">
-            <Radar color={BRAND.paper} size={36} />
+            <Radar color={BRAND.ink} size={36} />
             <Heading type="h4" className="text-accent-foreground">
               Meet someone
             </Heading>

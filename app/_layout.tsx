@@ -2,14 +2,7 @@
 import '../global.css';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  useFonts,
-} from '@expo-google-fonts/inter';
-import { Fraunces_600SemiBold, Fraunces_700Bold } from '@expo-google-fonts/fraunces';
+import { VarelaRound_400Regular, useFonts } from '@expo-google-fonts/varela-round';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
 import { useEffect } from 'react';
@@ -59,12 +52,7 @@ void SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-    Fraunces_600SemiBold,
-    Fraunces_700Bold,
+    VarelaRound_400Regular,
   });
   const hydrated = useStoreHydrated();
 
@@ -92,27 +80,20 @@ export default function RootLayout() {
     };
   }, []);
 
-  // Inject Google Fonts link tag for web to ensure fonts load through proxy
-  // Also register font family names as fallback if expo-font fails
+  // Inject the rounded brand font for web when the preview proxy blocks expo-font.
   useEffect(() => {
     if (Platform.OS === 'web') {
-      // Check if link already exists
       const existingLink = document.querySelector(
-        'link[href*="fonts.googleapis.com/css2?family=Inter"]',
+        'link[href*="fonts.googleapis.com/css2?family=Varela+Round"]',
       );
 
       if (!existingLink) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href =
-          'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap';
+        link.href = 'https://fonts.googleapis.com/css2?family=Varela+Round&display=swap';
         link.crossOrigin = 'anonymous';
         document.head.appendChild(link);
       }
-
-      // Note: The @import in global.css and the link tag above ensure Inter and
-      // Fraunces load. expo-font registers the exact family names used by the
-      // font-* utilities (Inter_400Regular, Fraunces_600SemiBold, ...).
     }
   }, []);
 
@@ -167,7 +148,7 @@ function AppStack() {
       screenOptions={{
         headerStyle: { backgroundColor: BRAND.paper },
         headerTintColor: BRAND.accent,
-        headerTitleStyle: { color: BRAND.ink, fontFamily: 'Fraunces_600SemiBold', fontSize: 18 },
+        headerTitleStyle: { color: BRAND.ink, fontFamily: 'VarelaRound_400Regular', fontSize: 18 },
         headerShadowVisible: false,
         headerBackTitle: 'Back',
         contentStyle: { backgroundColor: BRAND.paper },

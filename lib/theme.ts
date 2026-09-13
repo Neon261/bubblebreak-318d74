@@ -7,31 +7,31 @@
  * `useThemeColor`.
  */
 export const BRAND = {
-  /** Primary: warm apricot-coral. Passes AA with white labels on top. */
-  accent: '#c34b2e',
-  /** Soft apricot wash, for tints and bubbles. */
-  accentSoft: '#fbe4d6',
-  /** Deep plum ink used for text. */
-  ink: '#2f1d2d',
+  /** Primary coral. Dark labels are used on top for accessible contrast. */
+  accent: '#FF827D',
+  /** Soft coral wash, for tints and bubbles. */
+  accentSoft: '#FFE5E2',
+  /** Deep violet-black used for text. */
+  ink: '#332D3E',
   /** Secondary text. */
-  muted: '#857682',
-  /** Warm cream page background. */
-  paper: '#fffcf5',
-  /** Hairline borders on cream. */
-  border: '#eae0d4',
-  /** Teal secondary. */
-  teal: '#228b91',
-  /** Playful third colour. */
-  lilac: '#9b7fc4',
-  /** Warm amber highlight. */
-  sun: '#e0a12b',
-  /** Positive/verified green, warm-leaning so it sits with the apricot. */
-  success: '#2f8f63',
+  muted: '#756F7D',
+  /** Warm blush page background. */
+  paper: '#FBF7F4',
+  /** Hairline borders on the warm background. */
+  border: '#E7DFE4',
+  /** Requested soft green. */
+  teal: '#A8D8D5',
+  /** Requested violet. */
+  lilac: '#B7AEEB',
+  /** Warm highlight derived from coral. */
+  sun: '#FFB0A8',
+  /** Positive/verified green. */
+  success: '#5E918E',
 } as const;
 
 /** Bubble decoration tints, matching --color-bubble-* in global.css. */
 export const BUBBLE_TINTS = {
-  apricot: '#fbe1cd',
-  teal: '#d7ecec',
-  lilac: '#e9e0f2',
+  apricot: '#FFE5E2',
+  teal: '#DDEDEB',
+  lilac: '#E9E5FA',
 } as const;

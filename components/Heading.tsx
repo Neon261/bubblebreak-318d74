@@ -7,8 +7,8 @@ import { cn } from '@/lib/utils';
 type TypographyProps = ComponentProps<typeof Typography>;
 
 /**
- * Headings in the display face (Fraunces). Use for screen titles, card titles
- * and any line that should carry the brand voice; body copy stays on Inter.
+ * Headings use the rounded brand face. Use for screen titles, card titles,
+ * and any line that should carry the brand voice.
  */
 export function Heading({ className, type = 'h4', ...rest }: TypographyProps) {
   return <Typography type={type} className={cn('font-display', className)} {...rest} />;

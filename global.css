@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
 
 @import 'tailwindcss';
 @import 'uniwind';
@@ -40,68 +40,72 @@
 @source './node_modules/heroui-native/lib';
 
 /*
- * BubbleBreak — warm apricot accent, teal secondary, cream paper, plum ink.
- * Feminine without pink cliché: warm, playful, optimistic, urban.
- * Accent is deep enough for white labels to clear WCAG AA on fills.
+ * BubbleBreak — soft green, coral, violet, and a warm blush background.
+ * Coral stays primary, while dark ink on coral maintains readable contrast.
  */
 @layer theme {
   :root {
     @variant light {
-      --accent: oklch(0.57 0.16 35);
-      --accent-foreground: oklch(0.99 0.012 85);
-      --focus: var(--accent);
-      --background: oklch(0.99 0.009 82);
-      --foreground: oklch(0.26 0.04 330);
-      --muted: oklch(0.55 0.03 330);
-      --border: oklch(0.9 0.018 62);
-      --surface: oklch(1 0.004 85);
-      --success: oklch(0.55 0.1 190);
-      --warning: oklch(0.73 0.14 72);
-      --danger: oklch(0.55 0.19 20);
+      --accent: oklch(0.747 0.154 24);
+      --accent-foreground: oklch(0.29 0.025 310);
+      --focus: oklch(0.68 0.1 290);
+      --background: oklch(0.979 0.006 60);
+      --foreground: oklch(0.29 0.025 310);
+      --muted: oklch(0.54 0.02 310);
+      --border: oklch(0.9 0.012 325);
+      --surface: oklch(0.995 0.003 55);
+      --success: oklch(0.64 0.065 190);
+      --warning: oklch(0.79 0.075 290);
+      --danger: oklch(0.61 0.18 22);
     }
 
     @variant dark {
-      --accent: oklch(0.72 0.15 46);
-      --accent-foreground: oklch(0.2 0.03 40);
-      --focus: var(--accent);
-      --success: oklch(0.68 0.1 190);
-      --warning: oklch(0.78 0.14 72);
-      --danger: oklch(0.64 0.19 20);
+      --accent: oklch(0.747 0.154 24);
+      --accent-foreground: oklch(0.29 0.025 310);
+      --focus: oklch(0.79 0.075 290);
+      --background: oklch(0.979 0.006 60);
+      --foreground: oklch(0.29 0.025 310);
+      --muted: oklch(0.54 0.02 310);
+      --border: oklch(0.9 0.012 325);
+      --surface: oklch(0.995 0.003 55);
+      --success: oklch(0.64 0.065 190);
+      --warning: oklch(0.79 0.075 290);
+      --danger: oklch(0.61 0.18 22);
     }
   }
 }
 
 @theme {
-  /* Display face for the wordmark and big headings; body stays on the system UI face. */
-  --font-display: 'Fraunces_600SemiBold';
-  --font-display-bold: 'Fraunces_700Bold';
-  --font-sans: 'Inter_400Regular';
-  --font-sans-medium: 'Inter_500Medium';
-  --font-sans-semibold: 'Inter_600SemiBold';
-  --font-sans-bold: 'Inter_700Bold';
+  /* Varela Round is the cross-platform rounded alternative to VAG Rounded. */
+  --font-display: 'VarelaRound_400Regular';
+  --font-display-bold: 'VarelaRound_400Regular';
+  --font-sans: 'VarelaRound_400Regular';
+  --font-sans-medium: 'VarelaRound_400Regular';
+  --font-sans-semibold: 'VarelaRound_400Regular';
+  --font-sans-bold: 'VarelaRound_400Regular';
 
-  /* Category + decoration palette, tuned around the apricot/teal brand. */
-  --color-sun: oklch(0.79 0.14 78);
-  --color-berry: oklch(0.6 0.16 12);
-  --color-sky: oklch(0.62 0.1 232);
-  --color-grape: oklch(0.58 0.14 312);
-  --color-moss: oklch(0.6 0.1 162);
-  --color-clay: oklch(0.63 0.12 50);
-  --color-lagoon: oklch(0.58 0.09 200);
-  --color-lilac: oklch(0.68 0.09 300);
-  --color-sun-soft: oklch(0.96 0.045 82);
-  --color-berry-soft: oklch(0.96 0.03 14);
-  --color-sky-soft: oklch(0.96 0.028 232);
-  --color-grape-soft: oklch(0.96 0.028 312);
-  --color-moss-soft: oklch(0.96 0.03 162);
-  --color-clay-soft: oklch(0.96 0.03 52);
-  --color-lagoon-soft: oklch(0.95 0.032 200);
-  --color-lilac-soft: oklch(0.96 0.03 300);
+  /* Category + decoration palette built from green, coral, and violet. */
+  --color-sun: oklch(0.84 0.09 38);
+  --color-berry: oklch(0.747 0.154 24);
+  --color-sky: oklch(0.849 0.052 191);
+  --color-grape: oklch(0.78 0.087 291);
+  --color-moss: oklch(0.7 0.065 190);
+  --color-clay: oklch(0.72 0.11 24);
+  --color-lagoon: oklch(0.75 0.06 190);
+  --color-lilac: oklch(0.72 0.08 290);
+  --color-sun-soft: oklch(0.96 0.025 38);
+  --color-berry-soft: oklch(0.95 0.028 24);
+  --color-sky-soft: oklch(0.96 0.018 190);
+  --color-grape-soft: oklch(0.95 0.022 290);
+  --color-moss-soft: oklch(0.96 0.018 190);
+  --color-clay-soft: oklch(0.95 0.028 24);
+  --color-lagoon-soft: oklch(0.95 0.02 190);
+  --color-lilac-soft: oklch(0.95 0.022 290);
 
-  /* Bubble decorations: three tints that read on cream without fighting content. */
-  --color-bubble-apricot: oklch(0.93 0.055 68);
-  --color-bubble-teal: oklch(0.93 0.04 195);
-  --color-bubble-lilac: oklch(0.94 0.035 305);
+  /* Bubble decorations: soft versions of the three brand colours. */
+  --color-bubble-apricot: oklch(0.93 0.045 24);
+  --color-bubble-teal: oklch(0.93 0.025 190);
+  --color-bubble-lilac: oklch(0.93 0.03 290);
 }
 
 /*
