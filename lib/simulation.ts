@@ -1,3 +1,4 @@
+import { RECORDING_SCENARIO, WIEBKE } from '@/lib/demoScenario';
 import { distanceKm, travelMinutes } from '@/lib/geo';
 import { HOME, PEOPLE, PEOPLE_BY_ID, SPOTS, SPOTS_BY_ID } from '@/lib/mockData';
 import { pushLocalNotification } from '@/lib/notifications';
@@ -26,6 +27,13 @@ function schedule(key: string, delayMs: number, fn: () => void) {
 export function clearTimers(key: string) {
   timers.get(key)?.forEach((timer) => clearTimeout(timer));
   timers.delete(key);
+}
+
+/** Clears every scheduled recording action so the walkthrough can restart cleanly. */
+export function resetSimulationSession() {
+  timers.forEach((scheduled) => scheduled.forEach((timer) => clearTimeout(timer)));
+  timers.clear();
+  inboundStarted = false;
 }
 
 function randomBetween(min: number, max: number) {
@@ -73,6 +81,23 @@ export function startPingSimulation(pingId: string) {
   const ping = useAppStore.getState().pings[pingId];
   const spot = ping ? SPOTS_BY_ID[ping.spotId] : undefined;
   if (!ping || !spot) return;
+
+  const profile = useAppStore.getState().profile;
+  const isSandra =
+    profile.firstName.toLocaleLowerCase() === RECORDING_SCENARIO.userName.toLowerCase();
+  if (isSandra && spot.id === RECORDING_SCENARIO.spotId) {
+    schedule(pingId, 1200, () => {
+      const current = useAppStore.getState().pings[pingId];
+      if (!current || current.status !== 'open' || isFull(current)) return;
+      const joined = useAppStore
+        .getState()
+        .addJoin(pingId, personParticipant(WIEBKE, spot, RECORDING_SCENARIO.guestReadyMinutes));
+      if (joined) {
+        void pushLocalNotification(`${WIEBKE.name} wants to join!`, `${spot.name} — ${WIEBKE.bio}`);
+      }
+    });
+    return;
+  }
 
   const candidates = ping.notifiedIds
     .map((id) => PEOPLE_BY_ID[id])
@@ -124,12 +149,13 @@ export function startPingSimulation(pingId: string) {
 export function scheduleHostPlan(pingId: string) {
   const key = `${pingId}-plan`;
   clearTimers(key);
-  schedule(key, randomBetween(2600, 4200), () => {
+  const isRecordingInvite = pingId === `inbound-${WIEBKE.id}-${RECORDING_SCENARIO.spotId}`;
+  schedule(key, isRecordingInvite ? 1200 : randomBetween(2600, 4200), () => {
     const ping = useAppStore.getState().pings[pingId];
     if (!ping || ping.status !== 'open') return;
     useAppStore.getState().lockPing(ping.id);
     const spot = SPOTS_BY_ID[ping.spotId];
-    const host = PEOPLE_BY_ID[ping.hostId];
+    const host = PEOPLE_BY_ID[ping.hostId] ?? (ping.hostId === WIEBKE.id ? WIEBKE : undefined);
     if (spot && host) {
       void pushLocalNotification(
         'Where and when',
@@ -180,6 +206,43 @@ let inboundStarted = false;
 
 /** Other people's pings arriving on my phone over the session. */
 export function startInboundInvites() {
+  const state = useAppStore.getState();
+  const isSandra =
+    state.profile.firstName.toLocaleLowerCase() === RECORDING_SCENARIO.userName.toLowerCase();
+  const recordingPingId = `inbound-${WIEBKE.id}-${RECORDING_SCENARIO.spotId}`;
+
+  if (isSandra) {
+    if (state.pings[recordingPingId]) return;
+    inboundStarted = true;
+    schedule('inbound', 1400, () => {
+      const latest = useAppStore.getState();
+      if (latest.pings[recordingPingId]) return;
+      const spot = SPOTS_BY_ID[RECORDING_SCENARIO.spotId];
+      if (!spot) return;
+      latest.addInboundPing({
+        id: recordingPingId,
+        hostId: WIEBKE.id,
+        spotId: spot.id,
+        radiusKm: RECORDING_SCENARIO.radiusKm,
+        createdAt: Date.now(),
+        notifiedIds: [ME],
+        passedIds: [],
+        missedIds: [],
+        spotsForOthers: 2,
+        joins: [personParticipant(WIEBKE, spot, RECORDING_SCENARIO.hostReadyMinutes)],
+        status: 'open',
+        myResponse: 'none',
+        seen: false,
+        messages: [],
+      });
+      void pushLocalNotification(
+        `${WIEBKE.name} is heading out`,
+        `${spot.name} — tap if you want to join`,
+      );
+    });
+    return;
+  }
+
   if (inboundStarted) return;
   inboundStarted = true;
 

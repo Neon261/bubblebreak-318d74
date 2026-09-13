@@ -1,3 +1,4 @@
+import { WIEBKE } from '@/lib/demoScenario';
 import { HAMBURG_CENTER, HAMBURG_SPOTS, HOME, offsetFromHome } from '@/lib/hamburgSpots';
 import type { Interest, Person, Spot } from '@/lib/types';
 
@@ -258,11 +259,14 @@ const NOTIFICATIONS_ENABLED = new Set([
   'p-mira',
 ]);
 
-/** Simulated neighbours, including whether their phone can currently receive a ping. */
-export const PEOPLE: Person[] = PEOPLE_WITHOUT_NOTIFICATION_STATUS.map((person) => ({
-  ...person,
-  notificationsEnabled: NOTIFICATIONS_ENABLED.has(person.id),
-}));
+/** Simulated neighbours, including Wiebke's fixed recording fixture. */
+export const PEOPLE: Person[] = [
+  WIEBKE,
+  ...PEOPLE_WITHOUT_NOTIFICATION_STATUS.map((person) => ({
+    ...person,
+    notificationsEnabled: NOTIFICATIONS_ENABLED.has(person.id),
+  })),
+];
 
 export const PEOPLE_BY_ID: Record<string, Person> = Object.fromEntries(
   PEOPLE.map((person) => [person.id, person]),

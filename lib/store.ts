@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import { RECORDING_SCENARIO, recordingIntroPicks } from '@/lib/demoScenario';
 import { computeMeetAt, distanceKm, travelMinutes } from '@/lib/geo';
 import {
   buildIntroSentence,
@@ -59,9 +60,12 @@ function withIntro(profile: Profile): Profile {
   return { ...profile, intro: intro || profile.intro };
 }
 
-/** A brand new person: no answers yet, one random question drawn per group. */
+/** A brand new profile with one random, unanswered question per intro group. */
 function freshProfile(): Profile {
-  return { ...DEFAULT_PROFILE, introAnswers: randomIntroPicks() };
+  return {
+    ...DEFAULT_PROFILE,
+    introAnswers: randomIntroPicks(),
+  };
 }
 
 function hasPersistedProfile(value: unknown): value is { profile: Partial<Profile> } {
@@ -183,7 +187,27 @@ export const useAppStore = create<AppState>()(
         })),
 
       setFirstName: (firstName) =>
-        set((state) => ({ profile: withIntro({ ...state.profile, firstName: firstName.trim() }) })),
+        set((state) => {
+          const normalizedName = firstName.trim();
+          const isSandra =
+            normalizedName.toLocaleLowerCase() === RECORDING_SCENARIO.userName.toLowerCase();
+          return {
+            profile: withIntro({
+              ...state.profile,
+              firstName: normalizedName,
+              ...(isSandra
+                ? {
+                    introAnswers: recordingIntroPicks(),
+                    introVariant: 0,
+                    radiusKm: RECORDING_SCENARIO.radiusKm,
+                    locationPermission: 'granted' as const,
+                    location: RECORDING_SCENARIO.location,
+                    locationDetails: RECORDING_SCENARIO.locationDetails,
+                  }
+                : {}),
+            }),
+          };
+        }),
 
       setIntroAnswer: (categoryId, optionId) =>
         set((state) => {
