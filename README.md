@@ -1,6 +1,28 @@
-# Welcome to your Bilt project
+# BubbleBreak
 
 [![Built with Bilt](https://img.shields.io/endpoint?url=https%3A%2F%2Fapp.bilt.me%2Fapi%2Fbadge)](https://bilt.me)
+
+BubbleBreak is a mobile-first social app designed to help people step outside their usual social circles and make spontaneous, meaningful connections in Hamburg. It is aimed especially at people who are new to the city, feel alone, or simply want to meet others and do something nearby.
+
+Instead of browsing profiles, users choose a nearby public place or event, send out a local “ping,” and form a small group with people who are ready to join. BubbleBreak then helps the group agree on a meeting time and continue the conversation in a shared chat.
+
+## What the app does
+
+- Guides new users through a playful profile and introduction flow.
+- Discovers curated places and time-based events around Hamburg within an adjustable radius.
+- Presents nearby ideas on a map or as a list, grouped by categories such as food, culture, music, sports, and outdoor activities.
+- Lets a host choose an activity and set the number of available participant spots.
+- Sends a simulated local ping and shows interested participants joining over time.
+- Allows participants to choose how much time they need before leaving.
+- Calculates a shared meeting time using each participant’s preparation and travel time.
+- Creates a group plan with destination details, participant status, map information, and chat.
+- Includes local notifications and profile controls for interests, radius, group size, and account logout.
+
+## Product direction
+
+BubbleBreak explores whether technology can create meaningful connections by combining a shared reason to meet with different backgrounds, skills, and perspectives. The longer-term direction is to use AI to assemble thoughtfully mixed small groups, explain why the mix could work, and generate a short social mission that helps strangers connect.
+
+The current app is an MVP prototype. Its people, invitations, responses, and verification experience are simulated for demonstration purposes; they should not be interpreted as a live social network or real identity verification.
 
 ## Project info
 
@@ -61,13 +83,15 @@ Scan the QR code with Expo Go on your phone to see your app running locally.
 
 This project is built with:
 
-- React Native
-- Expo
+- React Native and Expo
 - TypeScript
-- AsyncStorage (local data persistence)
-- Expo Router (navigation)
+- Expo Router for navigation
+- Zustand and AsyncStorage for app state and local persistence
+- Bilt Cloud for backend and authentication capabilities
+- HeroUI Native and Uniwind for the interface and theme
+- Cross-platform maps and Expo notifications
 
-All generated automatically by Bilt from your natural language instructions.
+The project was created and developed with Bilt from natural-language product instructions.
 
 ## How can I test this project?
 
