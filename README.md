@@ -6,6 +6,8 @@ BubbleBreak is a mobile-first social app designed to help people step outside th
 
 Instead of browsing profiles, users choose a nearby public place or event, send out a local “ping,” and form a small group with people who are ready to join. BubbleBreak then helps the group agree on a meeting time and continue the conversation in a shared chat.
 
+A second way to use BubbleBreak is for moments when you do not already have a plan or simply have no idea what to do. Instead of creating your own Ping, you can browse existing invitations nearby, see what other people are planning, and spontaneously join a plan that interests you. This makes it easy to turn an unplanned afternoon or evening into a shared experience with people around you.
+
 ## What the app does
 
 - Guides new users through a playful profile and introduction flow.
